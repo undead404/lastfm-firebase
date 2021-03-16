@@ -32,7 +32,7 @@
 	"scripts": {
 		"fix": "eslint . --fix",
 		"lint": "eslint .",
-		"postinstall": "cd ./functions && yarn; cd .."
+		"postinstall": "cd ./client && yarn; cd ../functions && yarn; cd .."
 	},
 	"version": "0.1.0"
 }
