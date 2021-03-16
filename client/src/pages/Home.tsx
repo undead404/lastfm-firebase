@@ -5,10 +5,18 @@ import getProcessedTagNames from '../https-callables/get-processed-tag-names';
 
 export default function Home(): JSX.Element {
   const [error, setError] = useState<Error | undefined>();
+  const [isLoading, setIsLoading] = useState(false);
   const [tagNames, setTagNames] = useState<string[]>([]);
   useEffect(() => {
-    getProcessedTagNames().then(setTagNames).catch(setError);
+    setIsLoading(true);
+    getProcessedTagNames()
+      .then(setTagNames)
+      .finally(() => setIsLoading(false))
+      .catch(setError);
   }, []);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div>
       {error && <p>{error.message}</p>}

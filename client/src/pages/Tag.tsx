@@ -10,12 +10,20 @@ export interface TagParameters {
 }
 
 export default function Tag(): JSX.Element {
+  const [isLoading, setIsLoading] = useState(false);
   const { tagName } = useParams<TagParameters>();
   const [error, setError] = useState<Error | undefined>();
   const [albumsList, setAlbumsList] = useState<AlbumsList | undefined>();
   useEffect(() => {
-    getTagList(tagName).then(setAlbumsList).catch(setError);
+    setIsLoading(true);
+    getTagList(tagName)
+      .then(setAlbumsList)
+      .finally(() => setIsLoading(false))
+      .catch(setError);
   }, []);
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
   return (
     <div>
       <h2>{tagName}</h2>
