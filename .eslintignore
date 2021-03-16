@@ -29,3 +29,6 @@ lib/
 
 **/node_modules/**
 functions/node_modules
+client/config/**/*.js
+client/scripts/*.js
+**/react-app-env.d.ts
