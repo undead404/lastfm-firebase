@@ -1,1 +1,0 @@
-{"version":3,"file":"get-tag-list.js","sourceRoot":"","sources":["../../src/get-tag-list/get-tag-list.ts"],"names":[],"mappings":";;;;;AAAA,mDAA2C;AAC3C,wFAA8D;AAG/C,KAAK,UAAU,UAAU,CACtC,OAAe;IAEf,MAAM,QAAQ,GAAG,MAAM,0BAAS,EAAE;SAC/B,UAAU,CAAC,aAAa,CAAC;SACzB,GAAG,CAAC,6BAAiB,CAAC,OAAO,CAAC,CAAC;SAC/B,GAAG,EAAE,CAAC;IACT,OAAO,QAAQ,CAAC,IAAI,EAA+B,CAAC;AACtD,CAAC;AARD,6BAQC"}
