@@ -26,8 +26,10 @@ export const getProcessedTagNames = https.onCall(async () => ({
   tags: await getProcessedTagNamesFunction(),
 }));
 
-export const populateAlbumsStats = pubsub
-  .schedule('0 * * * *')
+export const populateAlbumsStats = runWith({
+  timeoutSeconds: 540,
+})
+  .pubsub.schedule('0 * * * *')
   .onRun(async () => {
     try {
       await populateAlbumsStatsFunction();
@@ -38,8 +40,10 @@ export const populateAlbumsStats = pubsub
     }
   });
 
-export const populateAlbumsTags = pubsub
-  .schedule('30 * * * *')
+export const populateAlbumsTags = runWith({
+  timeoutSeconds: 540,
+})
+  .pubsub.schedule('30 * * * *')
   .onRun(async () => {
     try {
       await populateAlbumsTagsFunction();
@@ -64,7 +68,7 @@ export const scrapeAlbums = runWith({
   memory: '1GB',
   timeoutSeconds: 540,
 })
-  .pubsub.schedule('0 3 * * *')
+  .pubsub.schedule('45 * * * *')
   .onRun(async () => {
     try {
       await scrapeAlbumsFunction();

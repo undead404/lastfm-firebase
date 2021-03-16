@@ -10,7 +10,7 @@ import sequentialAsyncForEach from '../common/sequential-async-for-each';
 import { AlbumRecord } from '../common/types';
 import storeTags from './store-tags';
 
-const ALBUMS_LIMIT = 100;
+const ALBUMS_LIMIT = 1000;
 
 export default async function populateAlbumsTags(): Promise<void> {
   const collection = firestore().collection('albums');

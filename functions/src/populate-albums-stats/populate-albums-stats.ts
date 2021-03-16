@@ -7,7 +7,7 @@ import getAlbumInfo from '../common/api/get-album-info';
 import sequentialAsyncForEach from '../common/sequential-async-for-each';
 import { AlbumRecord } from '../common/types';
 
-const ALBUMS_LIMIT = 100;
+const ALBUMS_LIMIT = 1000;
 
 export default async function populateAlbumsStats(): Promise<void> {
   const collection = firestore().collection('albums');
