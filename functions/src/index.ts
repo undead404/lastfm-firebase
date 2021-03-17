@@ -1,6 +1,7 @@
 import firebase from 'firebase-admin';
 import { https, logger, pubsub, runWith } from 'firebase-functions';
 
+import collectTagsPowersFunction from './collect-tags-powers/collect-tags-powers';
 import generateListFunction from './generate-list/generate-list';
 import getProcessedTagNamesFunction from './get-processed-tag-names/get-processed-tag-names';
 import getTagListFunction from './get-tag-list/get-tag-list';
@@ -10,6 +11,8 @@ import scrapeAlbumsFunction from './scrape-albums/scrape-albums';
 
 firebase.initializeApp();
 
+const HTTP_SUCCESS = 200;
+
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 //
@@ -17,6 +20,31 @@ firebase.initializeApp();
 //   functions.logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
+
+export const collectTagsPowers = runWith({
+  memory: '1GB',
+  timeoutSeconds: 540,
+}).https.onRequest(async (request, response) => {
+  try {
+    await collectTagsPowersFunction();
+    response.sendStatus(HTTP_SUCCESS);
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
+
+export const generateList = pubsub
+  .schedule('every 5 minutes')
+  .onRun(async () => {
+    try {
+      await generateListFunction();
+      return null;
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  });
 
 export const getTagList = https.onCall(async (data) => ({
   tagList: await getTagListFunction(data.tagName),
@@ -29,7 +57,7 @@ export const getProcessedTagNames = https.onCall(async () => ({
 export const populateAlbumsStats = runWith({
   timeoutSeconds: 540,
 })
-  .pubsub.schedule('0 * * * *')
+  .pubsub.schedule('every 15 minutes')
   .onRun(async () => {
     try {
       await populateAlbumsStatsFunction();
@@ -43,7 +71,7 @@ export const populateAlbumsStats = runWith({
 export const populateAlbumsTags = runWith({
   timeoutSeconds: 540,
 })
-  .pubsub.schedule('30 * * * *')
+  .pubsub.schedule('every 15 minutes')
   .onRun(async () => {
     try {
       await populateAlbumsTagsFunction();
@@ -54,21 +82,11 @@ export const populateAlbumsTags = runWith({
     }
   });
 
-export const generateList = pubsub.schedule('15 * * * *').onRun(async () => {
-  try {
-    await generateListFunction();
-    return null;
-  } catch (error) {
-    logger.error(error);
-    throw error;
-  }
-});
-
 export const scrapeAlbums = runWith({
   memory: '1GB',
   timeoutSeconds: 540,
 })
-  .pubsub.schedule('45 * * * *')
+  .pubsub.schedule('0 * * * *')
   .onRun(async () => {
     try {
       await scrapeAlbumsFunction();

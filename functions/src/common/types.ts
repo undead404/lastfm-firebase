@@ -21,6 +21,7 @@ export interface TagAlbumsList {
 export interface TagRecord {
   name: string;
   lastProcessedAt: null | firestore.Timestamp;
+  power: number | firestore.FieldValue;
 }
 
 export interface TagsList {

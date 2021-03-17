@@ -1,7 +1,6 @@
 import { firestore } from 'firebase-admin';
 import { logger } from 'firebase-functions';
 import keyBy from 'lodash/keyBy';
-import keys from 'lodash/keys';
 import mapValues from 'lodash/mapValues';
 import toLower from 'lodash/toLower';
 
@@ -15,7 +14,11 @@ const ALBUMS_LIMIT = 1000;
 export default async function populateAlbumsTags(): Promise<void> {
   const collection = firestore().collection('albums');
   const albumsToPopulate = (
-    await collection.where('tags', '==', null).limit(ALBUMS_LIMIT).get()
+    await collection
+      .where('tags', '==', null)
+      .where('listeners', '!=', null)
+      .limit(ALBUMS_LIMIT)
+      .get()
   ).docs;
   await sequentialAsyncForEach(albumsToPopulate, async (albumSnapshot) => {
     const albumRecord = albumSnapshot.data() as AlbumRecord;
@@ -27,8 +30,9 @@ export default async function populateAlbumsTags(): Promise<void> {
       keyBy(tagsObjects, (tagObject) => toLower(tagObject.name)),
       'count',
     );
-    const tagNames = keys(tags);
-    void storeTags(tagNames).catch((error) => {
+    void storeTags(
+      mapValues(tags, (tagCount) => tagCount * (albumRecord.listeners || 0)),
+    ).catch((error) => {
       logger.error(error);
       throw error;
     });
