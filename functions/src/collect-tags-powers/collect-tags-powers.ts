@@ -33,6 +33,7 @@ export default async function collectTagsPowers(): Promise<void> {
       }
       const tag: TagRecord = {
         lastProcessedAt: null,
+        listCreatedAt: null,
         name: tagName,
         power: tagCount,
       };

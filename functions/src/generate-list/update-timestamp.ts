@@ -5,10 +5,11 @@ import { TagRecord } from '../common/types';
 export default function updateTimestamp(
   tagRecord: TagRecord,
 ): Promise<firestore.WriteResult> {
+  const tagUpdate: Partial<TagRecord> = {
+    listCreatedAt: firestore.FieldValue.serverTimestamp(),
+  };
   return firestore()
     .collection('tags')
     .doc(encodeFirebaseKey(tagRecord.name))
-    .update({
-      lastProcessedAt: firestore.FieldValue.serverTimestamp(),
-    });
+    .update(tagUpdate);
 }

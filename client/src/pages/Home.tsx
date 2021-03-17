@@ -1,4 +1,4 @@
-import { Alert, Col, List, Row, Spin, Typography } from 'antd';
+import { Alert, List, Typography } from 'antd';
 import { Link } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -25,23 +25,15 @@ export default function Home(): JSX.Element {
     ),
     [],
   );
-  if (isLoading) {
-    return (
-      <Row gutter={16}>
-        <Col>
-          <Spin tip="Loading..." />
-        </Col>
-      </Row>
-    );
-  }
   return (
     <>
       {error && <Alert message={error.message} type="error" />}
       <List
-        header={<div>Available tags</div>}
-        footer={<div>More coming</div>}
         bordered
         dataSource={tagNames}
+        footer={<div>More coming</div>}
+        header={<div>Available tags</div>}
+        loading={isLoading}
         renderItem={renderTagName}
       />
     </>

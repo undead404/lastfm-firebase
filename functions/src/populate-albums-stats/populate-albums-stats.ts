@@ -3,7 +3,7 @@ import size from 'lodash/size';
 import sumBy from 'lodash/sumBy';
 import toNumber from 'lodash/toNumber';
 
-import getAlbumInfo from '../common/api/get-album-info';
+import getAlbumInfo from '../common/lastfm/get-album-info';
 import sequentialAsyncForEach from '../common/sequential-async-for-each';
 import { AlbumRecord } from '../common/types';
 

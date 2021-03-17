@@ -4,7 +4,7 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import toLower from 'lodash/toLower';
 
-import getAlbumTopTags from '../common/api/get-album-top-tags';
+import getAlbumTopTags from '../common/lastfm/get-album-top-tags';
 import sequentialAsyncForEach from '../common/sequential-async-for-each';
 import { AlbumRecord } from '../common/types';
 import storeTags from './store-tags';

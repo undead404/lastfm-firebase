@@ -15,6 +15,7 @@ export default async function storeTags(
       if (!snapshot.exists) {
         const tagRecord: TagRecord = {
           lastProcessedAt: null,
+          listCreatedAt: null,
           name: tagName,
           power: tagCount,
         };

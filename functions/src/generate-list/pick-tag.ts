@@ -5,7 +5,7 @@ import { TagRecord } from '../common/types';
 export default async function pickTag(): Promise<TagRecord> {
   const tagsCollection = firestore().collection('tags');
   const tagsSnapshot = await tagsCollection
-    .where('lastProcessedAt', '==', null)
+    .where('listCreatedAt', '==', null)
     .orderBy('power', 'desc')
     .limit(1)
     .get();

@@ -4,6 +4,7 @@ import isEqual from 'lodash/isEqual';
 import isNil from 'lodash/isNil';
 import uniq from 'lodash/uniq';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function getObjectUpdate<T extends Record<string, any>>(
   oldObject: T,
   newObject: T,
@@ -21,3 +22,4 @@ export default function getObjectUpdate<T extends Record<string, any>>(
   });
   return diff;
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */

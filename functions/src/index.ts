@@ -5,6 +5,9 @@ import collectTagsPowersFunction from './collect-tags-powers/collect-tags-powers
 import generateListFunction from './generate-list/generate-list';
 import getProcessedTagNamesFunction from './get-processed-tag-names/get-processed-tag-names';
 import getTagListFunction from './get-tag-list/get-tag-list';
+import initField from './init-fields/init-field';
+import populateAlbumsCoversFunction from './populate-albums-covers/populate-albums-covers';
+import populateAlbumsDatesFunction from './populate-albums-dates/populate-albums-dates';
 import populateAlbumsStatsFunction from './populate-albums-stats/populate-albums-stats';
 import populateAlbumsTagsFunction from './populate-albums-tags/populate-albums-tags';
 import scrapeAlbumsFunction from './scrape-albums/scrape-albums';
@@ -53,6 +56,47 @@ export const getTagList = https.onCall(async (data) => ({
 export const getProcessedTagNames = https.onCall(async () => ({
   tags: await getProcessedTagNamesFunction(),
 }));
+
+export const initFields = runWith({
+  memory: '1GB',
+  timeoutSeconds: 540,
+}).https.onRequest(async (request, response) => {
+  try {
+    await initField('tags', 'listCreatedAt');
+    await initField('albums', 'cover', 'date', 'thumbnail');
+    response.sendStatus(HTTP_SUCCESS);
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
+
+export const populateAlbumsCovers = runWith({
+  timeoutSeconds: 540,
+})
+  .pubsub.schedule('every 15 minutes')
+  .onRun(async () => {
+    try {
+      await populateAlbumsCoversFunction();
+      return null;
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  });
+export const populateAlbumsDates = runWith({
+  timeoutSeconds: 540,
+})
+  .pubsub.schedule('every 15 minutes')
+  .onRun(async () => {
+    try {
+      await populateAlbumsDatesFunction();
+      return null;
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  });
 
 export const populateAlbumsStats = runWith({
   timeoutSeconds: 540,

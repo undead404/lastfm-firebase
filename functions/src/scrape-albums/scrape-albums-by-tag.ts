@@ -3,9 +3,8 @@ import isEmpty from 'lodash/isEmpty';
 import map from 'lodash/map';
 import { v4 as uuid } from 'uuid';
 
-import getTagTopAlbums from '../common/api/get-tag-top-albums';
+import getTagTopAlbums from '../common/lastfm/get-tag-top-albums';
 import encodeFirebaseKey from '../common/encode-firebase-key';
-// import sequentialAsyncForEach from '../common/sequential-async-for-each';
 import { AlbumRecord, TagRecord } from '../common/types';
 
 import getObjectUpdate from './get-object-update';
@@ -16,6 +15,8 @@ export default async function scrapeAlbumsByTag(tag: TagRecord): Promise<void> {
     albums,
     (album): AlbumRecord => ({
       artist: album.artist,
+      cover: null,
+      date: null,
       duration: null,
       mbid: album.mbid || null,
       listeners: null,
@@ -23,6 +24,7 @@ export default async function scrapeAlbumsByTag(tag: TagRecord): Promise<void> {
       numberOfTracks: null,
       playcount: null,
       tags: null,
+      thumbnail: null,
     }),
   );
   const collection = firestore().collection('albums');
@@ -52,7 +54,11 @@ export default async function scrapeAlbumsByTag(tag: TagRecord): Promise<void> {
       }
     }),
   );
-  await firestore().collection('tags').doc(encodeFirebaseKey(tag.name)).update({
+  const tagUpdate: Partial<TagRecord> = {
     lastProcessedAt: firestore.FieldValue.serverTimestamp(),
-  });
+  };
+  await firestore()
+    .collection('tags')
+    .doc(encodeFirebaseKey(tag.name))
+    .update(tagUpdate);
 }

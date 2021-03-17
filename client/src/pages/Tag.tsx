@@ -1,4 +1,4 @@
-import { Alert, Col, List, Row, Spin, Tag as AntDTag, Typography } from 'antd';
+import { Alert, List, Tag as AntDTag, Typography } from 'antd';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 import sortBy from 'lodash/sortBy';
@@ -31,8 +31,9 @@ export default function Tag(): JSX.Element {
     (album: Album, index: number) => (
       <List.Item>
         <Typography.Paragraph>
+          <Typography.Text>{index + 1}. </Typography.Text>
           <Typography.Text copyable>
-            {index + 1}. {album.artist} - {album.name}
+            {`${album.artist} - ${album.name}`}
           </Typography.Text>
           {map(
             sortBy(
@@ -51,23 +52,15 @@ export default function Tag(): JSX.Element {
     ),
     [],
   );
-  if (isLoading) {
-    return (
-      <Row gutter={16}>
-        <Col span={16}>
-          <Spin tip="Loading..." />
-        </Col>
-      </Row>
-    );
-  }
   return (
     <>
       {error && <Alert message={error.message} type="error" />}
       <List
-        header={<Typography.Text>Best {tagName} albums.</Typography.Text>}
-        footer={<Typography.Text>More coming</Typography.Text>}
         bordered
         dataSource={albumsList?.albums || undefined}
+        footer={<Typography.Text>More coming</Typography.Text>}
+        header={<Typography.Text>Best {tagName} albums.</Typography.Text>}
+        loading={isLoading}
         renderItem={renderAlbum}
       />
     </>

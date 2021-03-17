@@ -26,7 +26,7 @@ export default function weighAlbum(
       ((album.playcount * album.listeners) /
         (album.numberOfTracks || AVERAGE_NUMBER_OF_TRACKS)) *
         averageSongDuration *
-        get(album, `tags.${encodeFirebaseKey(tagName)}`, 0) || 0;
+        get(album, `tags.${tagName}`, 0) || 0;
   }
   return {
     ...album,

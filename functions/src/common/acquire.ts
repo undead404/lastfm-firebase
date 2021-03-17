@@ -3,8 +3,8 @@ import { logger } from 'firebase-functions';
 import isEmpty from 'lodash/isEmpty';
 import { stringify } from 'query-string';
 
-import { DEFAULT_PARAMS } from './api/api-constants';
-import { Parameters, Payload } from './api/api-types';
+import { DEFAULT_PARAMS } from './lastfm/api-constants';
+import { Parameters, Payload } from './lastfm/api-types';
 import { LASTFM_API_ERRORS, MAX_RETRIES } from './constants';
 
 import sleep from './sleep';
