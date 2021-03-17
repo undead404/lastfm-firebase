@@ -1,11 +1,9 @@
 import firebase from 'firebase-admin';
 import { https, logger, pubsub, runWith } from 'firebase-functions';
 
-import collectTagsPowersFunction from './collect-tags-powers/collect-tags-powers';
 import generateListFunction from './generate-list/generate-list';
 import getProcessedTagNamesFunction from './get-processed-tag-names/get-processed-tag-names';
 import getTagListFunction from './get-tag-list/get-tag-list';
-import initField from './init-fields/init-field';
 import populateAlbumsCoversFunction from './populate-albums-covers/populate-albums-covers';
 import populateAlbumsDatesFunction from './populate-albums-dates/populate-albums-dates';
 import populateAlbumsStatsFunction from './populate-albums-stats/populate-albums-stats';
@@ -14,8 +12,6 @@ import scrapeAlbumsFunction from './scrape-albums/scrape-albums';
 
 firebase.initializeApp();
 
-const HTTP_SUCCESS = 200;
-
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 //
@@ -23,19 +19,6 @@ const HTTP_SUCCESS = 200;
 //   functions.logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
-
-export const collectTagsPowers = runWith({
-  memory: '1GB',
-  timeoutSeconds: 540,
-}).https.onRequest(async (request, response) => {
-  try {
-    await collectTagsPowersFunction();
-    response.sendStatus(HTTP_SUCCESS);
-  } catch (error) {
-    logger.error(error);
-    throw error;
-  }
-});
 
 export const generateList = pubsub
   .schedule('every 5 minutes')
@@ -56,20 +39,6 @@ export const getTagList = https.onCall(async (data) => ({
 export const getProcessedTagNames = https.onCall(async () => ({
   tags: await getProcessedTagNamesFunction(),
 }));
-
-export const initFields = runWith({
-  memory: '1GB',
-  timeoutSeconds: 540,
-}).https.onRequest(async (request, response) => {
-  try {
-    await initField('tags', 'listCreatedAt');
-    await initField('albums', 'cover', 'date', 'thumbnail');
-    response.sendStatus(HTTP_SUCCESS);
-  } catch (error) {
-    logger.error(error);
-    throw error;
-  }
-});
 
 export const populateAlbumsCovers = runWith({
   timeoutSeconds: 540,

@@ -1,31 +1,34 @@
-import { firestore } from 'firebase-admin';
 import map from 'lodash/map';
+import { BulkWriteOperation, WithId } from 'mongodb';
 
-import encodeFirebaseKey from '../common/encode-firebase-key';
+import MongoDatabase from '../common/mongo-database';
 import { TagRecord } from '../common/types';
 
 export default async function storeTags(
+  mongodb: MongoDatabase,
   tags: Record<string, number>,
 ): Promise<void> {
-  const collection = firestore().collection('tags');
-  await Promise.all(
+  const operations: BulkWriteOperation<TagRecord>[] = await Promise.all(
     map(tags, async (tagCount, tagName) => {
-      const reference = collection.doc(encodeFirebaseKey(tagName));
-      const snapshot = await reference.get();
-      if (!snapshot.exists) {
-        const tagRecord: TagRecord = {
-          lastProcessedAt: null,
-          listCreatedAt: null,
-          name: tagName,
-          power: tagCount,
-        };
-        await reference.set(tagRecord);
-      } else {
+      const tag = (await mongodb.tags.findOne({
+        name: tagName,
+      })) as WithId<TagRecord>;
+      if (tag) {
         const tagUpdate: Partial<TagRecord> = {
-          power: firestore.FieldValue.increment(tagCount),
+          power: tag.power + tagCount,
         };
-        await reference.update(tagUpdate);
+        return {
+          updateOne: { filter: { _id: tag._id }, update: { $set: tagUpdate } },
+        };
       }
+      const tagRecord: TagRecord = {
+        lastProcessedAt: null,
+        listCreatedAt: null,
+        name: tagName,
+        power: tagCount,
+      };
+      return { insertOne: { document: tagRecord } };
     }),
   );
+  await mongodb.tags.bulkWrite(operations);
 }

@@ -1,7 +1,5 @@
 import firebase from 'firebase/app';
 // eslint-disable-next-line import/no-duplicates
-import 'firebase/firestore';
-// eslint-disable-next-line import/no-duplicates
 import 'firebase/functions';
 
 const firebaseApp = firebase.initializeApp({

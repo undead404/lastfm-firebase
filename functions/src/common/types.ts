@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 export interface AlbumRecord {
   artist: string;
   cover: null | string;
@@ -14,22 +12,15 @@ export interface AlbumRecord {
   thumbnail: null | string;
 }
 
-export interface TagAlbumsList {
-  albums: {
-    artist: string;
-    name: string;
-  }[];
-  tagName: string;
-}
 export interface TagRecord {
   name: string;
-  lastProcessedAt: null | firestore.Timestamp | firestore.FieldValue;
-  listCreatedAt: null | firestore.Timestamp | firestore.FieldValue;
-  power: number | firestore.FieldValue;
+  lastProcessedAt: null | Date;
+  listCreatedAt: null | Date;
+  power: number;
 }
 
-export interface TagsList {
+export interface AlbumsList {
   albums: AlbumRecord[] | null;
-  createdAt: firestore.FieldValue | firestore.Timestamp;
+  createdAt: Date;
   name: string;
 }

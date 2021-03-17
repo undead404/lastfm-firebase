@@ -1,5 +1,3 @@
-import firebase from 'firebase/app';
-
 export interface Album {
   artist: string;
   name: string;
@@ -7,5 +5,5 @@ export interface Album {
 }
 export interface AlbumsList {
   albums: Album[] | null;
-  createdAt: firebase.firestore.Timestamp;
+  createdAt: Date;
 }

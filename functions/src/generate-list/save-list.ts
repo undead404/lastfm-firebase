@@ -1,18 +1,23 @@
-import { firestore } from 'firebase-admin';
-import encodeFirebaseKey from '../common/encode-firebase-key';
-import { AlbumRecord, TagRecord, TagsList } from '../common/types';
+import { UpdateWriteOpResult } from 'mongodb';
+
+import MongoDatabase from '../common/mongo-database';
+import { AlbumRecord, TagRecord, AlbumsList } from '../common/types';
 
 export default function saveList(
+  mongodb: MongoDatabase,
   tagRecord: TagRecord,
   albums: AlbumRecord[] | null,
-): Promise<firestore.WriteResult> {
-  const list: TagsList = {
+): Promise<UpdateWriteOpResult> {
+  const list: AlbumsList = {
     albums,
-    createdAt: firestore.FieldValue.serverTimestamp(),
+    createdAt: new Date(),
     name: tagRecord.name,
   };
-  return firestore()
-    .collection('albumsLists')
-    .doc(encodeFirebaseKey(tagRecord.name))
-    .set(list);
+  return mongodb.albumsLists.updateOne(
+    { name: tagRecord.name },
+    { $set: list },
+    {
+      upsert: true,
+    },
+  );
 }

@@ -1,16 +1,28 @@
-import { firestore } from 'firebase-admin';
-
-import { TagRecord } from '../common/types';
-
+import MongoDatabase from '../common/mongo-database';
 import scrapeAlbumsByTag from './scrape-albums-by-tag';
 
 export default async function scrapeAlbums(): Promise<void> {
-  const tagsSnapshot = await firestore()
-    .collection('tags')
-    .where('lastProcessedAt', '==', null)
-    .orderBy('power', 'desc')
-    .limit(1)
-    .get();
-  const tag = tagsSnapshot.docs[0].data() as TagRecord;
-  return scrapeAlbumsByTag(tag);
+  const mongodb = new MongoDatabase();
+  await mongodb.connect();
+  try {
+    const [tag] = await mongodb.tags
+      .find()
+      .project({
+        name: true,
+        lastProcessedAt: true,
+        listCreatedAt: true,
+        power: true,
+        weight: {
+          $multiply: [{ $subtract: ['$$NOW', '$lastProcessedAt'] }, '$power'],
+        },
+      })
+      .sort({
+        weight: -1,
+      })
+      .limit(1)
+      .toArray();
+    return scrapeAlbumsByTag(mongodb, tag);
+  } finally {
+    await mongodb.close();
+  }
 }

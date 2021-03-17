@@ -83,6 +83,17 @@ module.exports = {
         ],
       },
     },
+    {
+      files: ['functions/**/*.ts'],
+      rules: {
+        'no-underscore-dangle': [
+          'error',
+          {
+            allow: ['_id'],
+          },
+        ],
+      },
+    },
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {

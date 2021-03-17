@@ -1,13 +1,14 @@
-import { firestore } from 'firebase-admin';
-import encodeFirebaseKey from '../common/encode-firebase-key';
-import { TagAlbumsList } from '../common/types';
+import MongoDatabase from '../common/mongo-database';
+import { AlbumsList } from '../common/types';
 
 export default async function getTagList(
   tagName: string,
-): Promise<TagAlbumsList | undefined> {
-  const snapshot = await firestore()
-    .collection('albumsLists')
-    .doc(encodeFirebaseKey(tagName))
-    .get();
-  return snapshot.data() as TagAlbumsList | undefined;
+): Promise<AlbumsList | null> {
+  const mongodb = new MongoDatabase();
+  await mongodb.connect();
+  try {
+    return mongodb.albumsLists.findOne({ tagName });
+  } finally {
+    await mongodb.close();
+  }
 }

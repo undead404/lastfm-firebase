@@ -1,15 +1,14 @@
-import { firestore } from 'firebase-admin';
-import encodeFirebaseKey from '../common/encode-firebase-key';
+import { UpdateWriteOpResult, WithId } from 'mongodb';
+
+import MongoDatabase from '../common/mongo-database';
 import { TagRecord } from '../common/types';
 
 export default function updateTimestamp(
-  tagRecord: TagRecord,
-): Promise<firestore.WriteResult> {
+  mongodb: MongoDatabase,
+  tagRecord: WithId<TagRecord>,
+): Promise<UpdateWriteOpResult> {
   const tagUpdate: Partial<TagRecord> = {
-    listCreatedAt: firestore.FieldValue.serverTimestamp(),
+    listCreatedAt: new Date(),
   };
-  return firestore()
-    .collection('tags')
-    .doc(encodeFirebaseKey(tagRecord.name))
-    .update(tagUpdate);
+  return mongodb.tags.updateOne({ _id: tagRecord._id }, { $set: tagUpdate });
 }
