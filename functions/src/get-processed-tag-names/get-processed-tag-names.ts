@@ -1,21 +1,16 @@
 import map from 'lodash/map';
 
-import MongoDatabase from '../common/mongo-database';
+import mongodb from '../common/mongo-database';
 
 export default async function getProcessedTagNames(): Promise<string[]> {
-  const mongodb = new MongoDatabase();
   await mongodb.connect();
-  try {
-    const tagNames = await mongodb.albumsLists
-      .find({
-        albums: { $ne: null },
-      })
-      .project({
-        name: true,
-      })
-      .toArray();
-    return map(tagNames, 'name');
-  } finally {
-    await mongodb.close();
-  }
+  const tagNames = await mongodb.albumsLists
+    .find({
+      albums: { $ne: null },
+    })
+    .project<{ name: string }>({
+      name: true,
+    })
+    .toArray();
+  return map(tagNames, 'name');
 }

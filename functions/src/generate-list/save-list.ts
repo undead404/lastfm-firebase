@@ -1,10 +1,9 @@
 import { UpdateWriteOpResult } from 'mongodb';
 
-import MongoDatabase from '../common/mongo-database';
+import mongodb from '../common/mongo-database';
 import { AlbumRecord, TagRecord, AlbumsList } from '../common/types';
 
 export default function saveList(
-  mongodb: MongoDatabase,
   tagRecord: TagRecord,
   albums: AlbumRecord[] | null,
 ): Promise<UpdateWriteOpResult> {

@@ -56,7 +56,7 @@ export const populateAlbumsCovers = runWith({
 export const populateAlbumsDates = runWith({
   timeoutSeconds: 540,
 })
-  .pubsub.schedule('every 15 minutes')
+  .pubsub.schedule('every 30 minutes')
   .onRun(async () => {
     try {
       await populateAlbumsDatesFunction();

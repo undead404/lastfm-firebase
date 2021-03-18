@@ -1,18 +1,19 @@
-import map from 'lodash/map';
+import toPairs from 'lodash/toPairs';
 import { BulkWriteOperation, WithId } from 'mongodb';
 
-import MongoDatabase from '../common/mongo-database';
+import mongodb from '../common/mongo-database';
+import sequentialAsyncMap from '../common/sequential-async-map';
 import { TagRecord } from '../common/types';
 
 export default async function storeTags(
-  mongodb: MongoDatabase,
   tags: Record<string, number>,
 ): Promise<void> {
-  const operations: BulkWriteOperation<TagRecord>[] = await Promise.all(
-    map(tags, async (tagCount, tagName) => {
+  const operations: BulkWriteOperation<TagRecord>[] = await sequentialAsyncMap(
+    toPairs(tags),
+    async ([tagName, tagCount]) => {
       const tag = (await mongodb.tags.findOne({
         name: tagName,
-      })) as WithId<TagRecord>;
+      })) as WithId<TagRecord> | undefined;
       if (tag) {
         const tagUpdate: Partial<TagRecord> = {
           power: tag.power + tagCount,
@@ -28,7 +29,7 @@ export default async function storeTags(
         power: tagCount,
       };
       return { insertOne: { document: tagRecord } };
-    }),
+    },
   );
   await mongodb.tags.bulkWrite(operations);
 }

@@ -24,3 +24,7 @@ export interface AlbumsList {
   createdAt: Date;
   name: string;
 }
+
+export type Weighted<T> = T & {
+  readonly weight: number;
+};

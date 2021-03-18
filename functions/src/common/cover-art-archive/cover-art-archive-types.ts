@@ -2,7 +2,7 @@ export interface CoverArtArchiveResponse {
   images: {
     image: string;
     thumbnails: {
-      '250': string;
+      small: string;
       large: string;
     };
     types: string[];

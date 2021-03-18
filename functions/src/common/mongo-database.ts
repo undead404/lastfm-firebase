@@ -10,7 +10,7 @@ import { AlbumRecord, AlbumsList, TagRecord } from './types';
 
 const uri = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/${MONGODB_DATABASE}?retryWrites=true&writeConcern=majority`;
 
-export default class MongoDatabase {
+class MongoDatabase {
   private client: MongoClient;
 
   constructor() {
@@ -28,11 +28,6 @@ export default class MongoDatabase {
     return this.database.collection<AlbumsList>('albumsLists');
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  async close(): Promise<void> {
-    // return this.client.close();
-  }
-
   connect(): Promise<MongoClient> {
     return this.client.connect();
   }
@@ -41,7 +36,13 @@ export default class MongoDatabase {
     return this.client.db(MONGODB_DATABASE);
   }
 
+  get isConnected(): boolean {
+    return this.client.isConnected();
+  }
+
   get tags(): Collection<TagRecord> {
     return this.database.collection<TagRecord>('tags');
   }
 }
+
+export default new MongoDatabase();
