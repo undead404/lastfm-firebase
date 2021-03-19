@@ -94,6 +94,41 @@ module.exports = {
         ],
       },
     },
+    {
+      files: ['client/**/*.tsx'],
+      rules: {
+        'react/boolean-prop-naming': 'error',
+        'react/display-name': 'error',
+        'react/function-component-definition': [
+          'error',
+          {
+            namedComponents: 'function-declaration',
+            unnamedComponents: 'arrow-function',
+          },
+        ],
+        'react/jsx-key': 'error',
+        'react/jsx-no-comment-textnodes': 'error',
+        'react/jsx-no-duplicate-props': 'error',
+        'react/jsx-no-target-blank': 'error',
+        'react/jsx-no-undef': 'error',
+        'react/jsx-sort-props': 'warn',
+        'react/jsx-uses-react': 'error',
+        'react/jsx-uses-vars': 'error',
+        'react/no-children-prop': 'error',
+        'react/no-danger-with-children': 'error',
+        'react/no-deprecated': 'error',
+        'react/no-direct-mutation-state': 'error',
+        'react/no-find-dom-node': 'error',
+        'react/no-is-mounted': 'error',
+        'react/no-render-return-value': 'error',
+        'react/no-string-refs': 'error',
+        'react/no-unescaped-entities': 'error',
+        'react/no-unknown-property': 'error',
+        'react/require-render-return': 'error',
+        'react-hooks/rules-of-hooks': 'error',
+        'react-hooks/exhaustive-deps': 'warn',
+      },
+    },
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
@@ -110,6 +145,8 @@ module.exports = {
     'eslint-comments',
     'jest',
     '@typescript-eslint',
+    'react',
+    'react-hooks',
   ],
   root: true,
   rules: {
@@ -169,8 +206,11 @@ module.exports = {
     'import/resolver': {
       typescript: {
         alwaysTryTypes: true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`,
-        project: ['client', './functions'],
+        project: ['./client', './functions'],
       },
+    },
+    react: {
+      version: '17.0',
     },
   },
 };

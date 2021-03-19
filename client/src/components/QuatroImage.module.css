@@ -1,0 +1,12 @@
+.quarter {
+    height: 100%;
+}
+.quarterWrapper {
+    flex-basis: 125px;
+    flex-grow: 1;
+}
+.wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+}

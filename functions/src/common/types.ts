@@ -1,7 +1,7 @@
 export interface AlbumRecord {
   artist: string;
-  cover: null | string;
-  date: null | string;
+  cover?: null | string;
+  date?: null | string;
   duration: number | null;
   listeners: number | null;
   mbid: string | null;
@@ -9,7 +9,7 @@ export interface AlbumRecord {
   numberOfTracks: number | null;
   playcount: number | null;
   tags: { [name: string]: number } | null;
-  thumbnail: null | string;
+  thumbnail?: null | string;
 }
 
 export interface TagRecord {
@@ -17,12 +17,7 @@ export interface TagRecord {
   lastProcessedAt: null | Date;
   listCreatedAt: null | Date;
   power: number;
-}
-
-export interface AlbumsList {
-  albums: AlbumRecord[] | null;
-  createdAt: Date;
-  name: string;
+  topAlbums?: AlbumRecord[] | null;
 }
 
 export type Weighted<T> = T & {

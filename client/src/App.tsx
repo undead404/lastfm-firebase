@@ -1,8 +1,8 @@
 import { Layout, PageHeader, Typography } from 'antd';
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 import './App.css';
 import Home from './pages/Home';
-import Tag from './pages/Tag';
+import TagPage from './pages/Tag';
 
 function App(): JSX.Element {
   return (
@@ -15,7 +15,6 @@ function App(): JSX.Element {
                 LastFM analysis
               </Link>
             }
-            subTitle="This is a subtitle"
           />
         </Layout.Header>
         <Layout.Content>
@@ -24,7 +23,7 @@ function App(): JSX.Element {
               <Home />
             </Route>
             <Route path="/tag/:tagName">
-              <Tag />
+              <TagPage />
             </Route>
           </Switch>
         </Layout.Content>

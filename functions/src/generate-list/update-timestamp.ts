@@ -1,13 +1,13 @@
-import { UpdateWriteOpResult, WithId } from 'mongodb';
+import { UpdateWriteOpResult } from 'mongodb';
 
 import mongodb from '../common/mongo-database';
 import { TagRecord } from '../common/types';
 
 export default function updateTimestamp(
-  tagRecord: WithId<TagRecord>,
+  tagRecord: Pick<TagRecord, 'name'>,
 ): Promise<UpdateWriteOpResult> {
   const tagUpdate: Partial<TagRecord> = {
     listCreatedAt: new Date(),
   };
-  return mongodb.tags.updateOne({ _id: tagRecord._id }, { $set: tagUpdate });
+  return mongodb.tags.updateOne({ name: tagRecord.name }, { $set: tagUpdate });
 }

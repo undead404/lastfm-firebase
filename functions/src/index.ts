@@ -2,8 +2,8 @@ import firebase from 'firebase-admin';
 import { https, logger, pubsub, runWith } from 'firebase-functions';
 
 import generateListFunction from './generate-list/generate-list';
-import getProcessedTagNamesFunction from './get-processed-tag-names/get-processed-tag-names';
-import getTagListFunction from './get-tag-list/get-tag-list';
+import getTagsFunction from './get-tags/get-tags';
+import getTagFunction from './get-tag/get-tag';
 import populateAlbumsCoversFunction from './populate-albums-covers/populate-albums-covers';
 import populateAlbumsDatesFunction from './populate-albums-dates/populate-albums-dates';
 import populateAlbumsStatsFunction from './populate-albums-stats/populate-albums-stats';
@@ -32,13 +32,27 @@ export const generateList = pubsub
     }
   });
 
-export const getTagList = https.onCall(async (data) => ({
-  tagList: await getTagListFunction(data.tagName),
-}));
+export const getTag = https.onCall(async (data) => {
+  try {
+    return {
+      tag: await getTagFunction(data.tagName),
+    };
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
 
-export const getProcessedTagNames = https.onCall(async () => ({
-  tags: await getProcessedTagNamesFunction(),
-}));
+export const getTags = https.onCall(async () => {
+  try {
+    return {
+      tags: await getTagsFunction(),
+    };
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
 
 export const populateAlbumsCovers = runWith({
   timeoutSeconds: 540,

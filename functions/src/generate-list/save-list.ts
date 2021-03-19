@@ -1,20 +1,19 @@
 import { UpdateWriteOpResult } from 'mongodb';
 
 import mongodb from '../common/mongo-database';
-import { AlbumRecord, TagRecord, AlbumsList } from '../common/types';
+import { AlbumRecord, TagRecord } from '../common/types';
 
 export default function saveList(
-  tagRecord: TagRecord,
+  tagRecord: Pick<TagRecord, 'name'>,
   albums: AlbumRecord[] | null,
 ): Promise<UpdateWriteOpResult> {
-  const list: AlbumsList = {
-    albums,
-    createdAt: new Date(),
-    name: tagRecord.name,
+  const tagUpdate: Partial<TagRecord> = {
+    topAlbums: albums,
+    listCreatedAt: new Date(),
   };
-  return mongodb.albumsLists.updateOne(
+  return mongodb.tags.updateOne(
     { name: tagRecord.name },
-    { $set: list },
+    { $set: tagUpdate },
     {
       upsert: true,
     },

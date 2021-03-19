@@ -5,7 +5,7 @@ export default async function getCoverArtInfo(
   mbid: string,
 ): Promise<CoverArtArchiveResponse | null> {
   try {
-    const response = await axios.get(
+    const response = await axios.get<CoverArtArchiveResponse>(
       `http://coverartarchive.org/release/${mbid}`,
     );
     return response.data;

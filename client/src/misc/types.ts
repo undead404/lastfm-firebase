@@ -1,9 +1,15 @@
 export interface Album {
   artist: string;
+  cover: string | null;
+  date: string | null;
   name: string;
-  tags: Record<string, number>;
+  tags: Record<string, number> | null;
+  thumbnail: string | null;
 }
-export interface AlbumsList {
-  albums: Album[] | null;
-  createdAt: Date;
+
+export interface Tag {
+  listCreatedAt: Date | null;
+  name: string;
+  topAlbums?: Album[] | null;
+  power: number;
 }

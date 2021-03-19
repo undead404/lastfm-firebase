@@ -1,53 +1,41 @@
-import { Alert, List, Tag as AntDTag, Typography } from 'antd';
-import filter from 'lodash/filter';
-import map from 'lodash/map';
-import sortBy from 'lodash/sortBy';
-import toPairs from 'lodash/toPairs';
+import { Alert, List, Typography } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import AlbumCard from '../components/AlbumCard';
 
-import getTagList from '../https-callables/get-tag-list';
-import { Album, AlbumsList } from '../misc/types';
+import getTag from '../https-callables/get-tag';
+import { Album, Tag } from '../misc/types';
 
 export interface TagParameters {
   tagName: string;
 }
 
-const TAG_COUNT_LIMIT = 50;
+const LIST_GRID_CONFIG = {
+  gutter: 24,
+  lg: 2,
+  md: 1,
+  sm: 1,
+  xl: 2,
+  xs: 1,
+  xxl: 3,
+};
 
-export default function Tag(): JSX.Element {
+export default function TagPage(): JSX.Element {
   const [isLoading, setIsLoading] = useState(false);
   const { tagName } = useParams<TagParameters>();
   const [error, setError] = useState<Error | undefined>();
-  const [albumsList, setAlbumsList] = useState<AlbumsList | undefined>();
+  const [tag, setTag] = useState<Tag | null>(null);
   useEffect(() => {
     setIsLoading(true);
-    getTagList(tagName)
-      .then(setAlbumsList)
+    getTag(tagName)
+      .then(setTag)
       .finally(() => setIsLoading(false))
       .catch(setError);
-  }, []);
+  }, [tagName]);
   const renderAlbum = useCallback(
     (album: Album, index: number) => (
       <List.Item>
-        <Typography.Paragraph>
-          <Typography.Text>{index + 1}. </Typography.Text>
-          <Typography.Text copyable>
-            {`${album.artist} - ${album.name}`}
-          </Typography.Text>
-          {map(
-            sortBy(
-              filter(
-                toPairs(album.tags),
-                ([, tagCount]) => tagCount > TAG_COUNT_LIMIT,
-              ),
-              [([, tagCount]) => -tagCount],
-            ),
-            ([albumTagName]) => (
-              <AntDTag>{albumTagName}</AntDTag>
-            ),
-          )}
-        </Typography.Paragraph>
+        <AlbumCard album={album} index={index} />
       </List.Item>
     ),
     [],
@@ -57,9 +45,12 @@ export default function Tag(): JSX.Element {
       {error && <Alert message={error.message} type="error" />}
       <List
         bordered
-        dataSource={albumsList?.albums || undefined}
+        dataSource={tag?.topAlbums || undefined}
         footer={<Typography.Text>More coming</Typography.Text>}
-        header={<Typography.Text>Best {tagName} albums.</Typography.Text>}
+        grid={LIST_GRID_CONFIG}
+        header={
+          <Typography.Title level={1}>Best {tagName} albums.</Typography.Title>
+        }
         loading={isLoading}
         renderItem={renderAlbum}
       />

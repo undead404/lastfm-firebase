@@ -6,15 +6,23 @@ import mongodb from '../common/mongo-database';
 import { TagRecord, Weighted } from '../common/types';
 
 export default async function pickTag(): Promise<
-  WithId<TagRecord> | undefined
+  Pick<WithId<TagRecord>, '_id' | 'name' | 'power'> | undefined
 > {
-  let [tag]: (WithId<TagRecord> | undefined)[] = (await mongodb.tags
+  let [tag]: (
+    | Pick<WithId<TagRecord>, '_id' | 'name' | 'power'>
+    | undefined
+  )[] = (await mongodb.tags
     .find({
       listCreatedAt: null,
     })
+    .project<Pick<WithId<TagRecord>, '_id' | 'name' | 'power'>>({
+      _id: true,
+      name: true,
+      power: true,
+    })
     .sort({ power: -1 })
     .limit(1)
-    .toArray()) as WithId<TagRecord>[];
+    .toArray()) as Pick<WithId<TagRecord>, '_id' | 'name' | 'power'>[];
   if (tag) {
     logger.info(`Picked tag: ${tag.name}`);
     return tag;
@@ -22,11 +30,9 @@ export default async function pickTag(): Promise<
   tag = head(
     await mongodb.tags
       .find()
-      .project<Weighted<WithId<TagRecord>>>({
+      .project<Weighted<Pick<WithId<TagRecord>, '_id' | 'name' | 'power'>>>({
         _id: true,
         name: true,
-        lastProcessedAt: true,
-        listCreatedAt: true,
         power: true,
         weight: {
           $multiply: [
@@ -42,7 +48,7 @@ export default async function pickTag(): Promise<
           ],
         },
       })
-      .sort({ power: -1 })
+      .sort({ weight: -1 })
       .limit(1)
       .toArray(),
   );

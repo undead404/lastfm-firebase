@@ -10,8 +10,6 @@ export default async function scrapeAlbumsByTag(tag: TagRecord): Promise<void> {
     albums,
     (album): AlbumRecord => ({
       artist: album.artist,
-      cover: null,
-      date: null,
       duration: null,
       mbid: album.mbid || null,
       listeners: null,
@@ -19,7 +17,6 @@ export default async function scrapeAlbumsByTag(tag: TagRecord): Promise<void> {
       numberOfTracks: null,
       playcount: null,
       tags: null,
-      thumbnail: null,
     }),
   );
   await mongodb.albums.bulkWrite(
@@ -31,8 +28,4 @@ export default async function scrapeAlbumsByTag(tag: TagRecord): Promise<void> {
       },
     })),
   );
-  const tagUpdate: Partial<TagRecord> = {
-    lastProcessedAt: new Date(),
-  };
-  await mongodb.tags.updateOne({ name: tag.name }, { $set: tagUpdate });
 }

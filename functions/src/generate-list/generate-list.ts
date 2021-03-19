@@ -11,7 +11,7 @@ import updateTimestamp from './update-timestamp';
 const AVERAGE_NUMBER_OF_TRACKS = 7;
 const AVERAGE_SONG_DURATION = 210;
 const AVERAGE_ALBUM_DURATION = AVERAGE_SONG_DURATION * AVERAGE_NUMBER_OF_TRACKS;
-const LIST_LENGTH = 10;
+const LIST_LENGTH = 100;
 
 export default async function generateList(): Promise<void> {
   if (!mongodb.isConnected) {

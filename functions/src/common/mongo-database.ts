@@ -1,3 +1,4 @@
+import { logger } from 'firebase-functions';
 import { Collection, Db, MongoClient } from 'mongodb';
 
 import {
@@ -6,7 +7,7 @@ import {
   MONGODB_PASSWORD,
   MONGODB_USERNAME,
 } from './environment';
-import { AlbumRecord, AlbumsList, TagRecord } from './types';
+import { AlbumRecord, TagRecord } from './types';
 
 const uri = `mongodb+srv://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@${MONGODB_CLUSTER}/${MONGODB_DATABASE}?retryWrites=true&writeConcern=majority`;
 
@@ -24,11 +25,8 @@ class MongoDatabase {
     return this.database.collection<AlbumRecord>('albums');
   }
 
-  get albumsLists(): Collection<AlbumsList> {
-    return this.database.collection<AlbumsList>('albumsLists');
-  }
-
   connect(): Promise<MongoClient> {
+    logger.debug('mongodb.connect()');
     return this.client.connect();
   }
 

@@ -5,9 +5,11 @@
   "dependencies": {
     "antd": "~4.14.0",
     "firebase": "~8.3.0",
+    "localforage": "~1.9.0",
     "lodash": "~4.17.21",
     "react": "~17.0.1",
     "react-dom": "~17.0.1",
+    "react-image": "~4.0.3",
     "react-router-dom": "~5.2.0",
     "web-vitals": "~1.1.1"
   },
