@@ -1,7 +1,10 @@
-import { Card, Typography } from 'antd';
+import { CheckCircleTwoTone } from '@ant-design/icons';
+import { Badge, Card, Tooltip, Typography } from 'antd';
+import { formatDistance, formatISO, isBefore } from 'date-fns';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 import orderBy from 'lodash/orderBy';
+import { useMemo } from 'react';
 
 import { Tag } from '../misc/types';
 
@@ -13,30 +16,58 @@ export interface TagPreviewProperties {
 }
 
 export default function TagPreview({ tag }: TagPreviewProperties): JSX.Element {
-  const previewImagesSources = map(
-    filter(orderBy(tag.topAlbums, ['power'], ['desc']), 'thumbnail'),
-    'thumbnail',
-  ) as string[];
+  const previewImagesSources = useMemo(
+    () =>
+      map(
+        filter(orderBy(tag.topAlbums, ['power'], ['desc']), 'thumbnail'),
+        'thumbnail',
+      ) as string[],
+    [tag.topAlbums],
+  );
+  const ago = useMemo(() => {
+    if (!tag.lastProcessedAt || !tag.listCreatedAt) {
+      return '';
+    }
+    if (!isBefore(tag.lastProcessedAt, tag.listCreatedAt)) {
+      return '';
+    }
+    return `Albums were scraped ${formatDistance(
+      new Date(),
+      tag.listCreatedAt,
+    )} ago`;
+  }, [tag.lastProcessedAt, tag.listCreatedAt]);
   return (
-    <Link href={`/tag/${tag.name}`}>
-      <Card
-        cover={
-          <QuatroImage
-            height={250}
-            imagesSources={previewImagesSources}
-            width={250}
-          />
-        }
-      >
-        <Card.Meta
-          description={
-            <Typography.Paragraph>
-              List created at: {tag.listCreatedAt?.toISOString?.()}
-            </Typography.Paragraph>
+    <Badge
+      count={
+        ago ? (
+          <Tooltip title={ago}>
+            <CheckCircleTwoTone twoToneColor="#52c41a" />
+          </Tooltip>
+        ) : null
+      }
+    >
+      <Link href={`/tag/${tag.name}`}>
+        <Card
+          cover={
+            <QuatroImage
+              height={250}
+              imagesSources={previewImagesSources}
+              width={250}
+            />
           }
-          title={<Typography.Text>{tag.name}</Typography.Text>}
-        />
-      </Card>
-    </Link>
+        >
+          <Card.Meta
+            description={
+              tag.listCreatedAt ? (
+                <Typography.Paragraph>
+                  List created at: {formatISO(tag.listCreatedAt)}
+                </Typography.Paragraph>
+              ) : null
+            }
+            title={<Typography.Text>{tag.name}</Typography.Text>}
+          />
+        </Card>
+      </Link>
+    </Badge>
   );
 }

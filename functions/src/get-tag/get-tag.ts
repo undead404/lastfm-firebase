@@ -1,13 +1,25 @@
+import { formatISO } from 'date-fns';
 import { logger } from 'firebase-functions';
+
 import mongodb from '../common/mongo-database';
-import { TagRecord } from '../common/types';
+import { SerializableTag } from '../common/types';
 
 export default async function getTag(
   tagName: string,
-): Promise<TagRecord | null> {
+): Promise<SerializableTag | null> {
   logger.info(`getTag(${tagName})`);
   if (!mongodb.isConnected) {
     await mongodb.connect();
   }
-  return mongodb.tags.findOne({ name: tagName });
+  const tag = await mongodb.tags.findOne({ name: tagName });
+  if (!tag) {
+    return null;
+  }
+  return {
+    ...tag,
+    lastProcessedAt: tag.lastProcessedAt
+      ? formatISO(tag.lastProcessedAt)
+      : null,
+    listCreatedAt: tag.listCreatedAt ? formatISO(tag.listCreatedAt) : null,
+  };
 }

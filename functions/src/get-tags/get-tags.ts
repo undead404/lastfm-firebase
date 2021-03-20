@@ -1,6 +1,6 @@
 import { logger } from 'firebase-functions';
 import mongodb from '../common/mongo-database';
-import { TagRecord } from '../common/types';
+import { SerializableTag } from '../common/types';
 import countTags from './count-tags';
 
 const DEFAULT_TAGS_LIMIT = 12;
@@ -11,7 +11,7 @@ export interface GetTagsOptions {
 }
 
 export interface GetTagsResponse {
-  tags: TagRecord[];
+  tags: SerializableTag[];
   total: number;
 }
 
@@ -27,6 +27,21 @@ export default async function getTags({
     tags: await mongodb.tags
       .find({
         topAlbums: { $ne: null },
+      })
+      .project<SerializableTag>({
+        lastProcessedAt: {
+          $dateToString: {
+            date: '$lastProcessedAt',
+          },
+        },
+        name: true,
+        listCreatedAt: {
+          $dateToString: {
+            date: '$listCreatedAt',
+          },
+        },
+        power: true,
+        topAlbums: true,
       })
       .sort({
         power: -1,

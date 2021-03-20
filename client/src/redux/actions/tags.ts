@@ -5,7 +5,7 @@ import {
   TAGS_ACQUIRE_LOADING,
   TAGS_ACQUIRE_SUCCESS,
 } from '../constants';
-import getTags, { GetTagsResponse } from '../../https-callables/get-tags';
+import getTags, { GetTagsResult } from '../../https-callables/get-tags';
 import { Tag } from '../../misc/types';
 
 const DEFAULT_TAGS_LIMIT = 12;
@@ -45,7 +45,7 @@ export function setTagsAcquireLoading(): TagsAcquireLoadingAction {
 }
 
 export function setTagsAcquireSuccess(
-  getTagsResponse: GetTagsResponse,
+  getTagsResponse: GetTagsResult,
 ): TagsAcquireSuccessAction {
   return {
     tags: getTagsResponse.tags,

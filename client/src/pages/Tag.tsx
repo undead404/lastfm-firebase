@@ -47,7 +47,7 @@ export default function TagPage(): JSX.Element {
         footer={<Typography.Text>More coming</Typography.Text>}
         grid={LIST_GRID_CONFIG}
         header={
-          <Typography.Title level={1}>Best {tagName} albums.</Typography.Title>
+          <Typography.Title level={1}>Best {tagName} albums</Typography.Title>
         }
         itemLayout="vertical"
         loading={isLoading}

@@ -23,3 +23,11 @@ export interface TagRecord {
 export type Weighted<T> = T & {
   readonly weight: number;
 };
+
+export type SerializableTag = Omit<
+  TagRecord,
+  'lastProcessedAt' | 'listCreatedAt'
+> & {
+  lastProcessedAt: null | string;
+  listCreatedAt: null | string;
+};
