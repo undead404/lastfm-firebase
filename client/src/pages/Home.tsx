@@ -73,7 +73,9 @@ export default function Home(): JSX.Element {
         dataSource={tags || undefined}
         footer={<Typography.Text>More coming</Typography.Text>}
         grid={LIST_GRID_CONFIG}
-        header={<Typography.Title level={1}>Available genre charts</Typography.Title>}
+        header={
+          <Typography.Title level={1}>Available genre charts</Typography.Title>
+        }
         loading={isLoading}
         pagination={pagination}
         renderItem={renderTag}

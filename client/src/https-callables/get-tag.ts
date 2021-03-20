@@ -1,8 +1,13 @@
-import firebaseApp from '../misc/firebase-app';
+import { functions, performance } from '../misc/firebase-app';
 import { Tag } from '../misc/types';
 
-const callable = firebaseApp.functions().httpsCallable('getTag');
+const callable = functions.httpsCallable('getTag');
 
 export default async function getTag(tagName: string): Promise<Tag | null> {
-  return (await callable({ tagName })).data.tag;
+  const trace = performance.trace('GET_TAG_REQUEST');
+  trace.putAttribute('tagName', tagName);
+  trace.start();
+  const { tag }: { tag: Tag | null } = (await callable({ tagName })).data;
+  trace.stop();
+  return tag;
 }
