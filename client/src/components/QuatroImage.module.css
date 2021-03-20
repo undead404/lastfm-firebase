@@ -2,7 +2,7 @@
     height: 100%;
 }
 .quarterWrapper {
-    flex-basis: 125px;
+    flex-basis: 50%;
     flex-grow: 1;
 }
 .wrapper {

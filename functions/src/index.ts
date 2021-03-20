@@ -43,11 +43,9 @@ export const getTag = https.onCall(async (data) => {
   }
 });
 
-export const getTags = https.onCall(async () => {
+export const getTags = https.onCall(async (data) => {
   try {
-    return {
-      tags: await getTagsFunction(),
-    };
+    return await getTagsFunction(data);
   } catch (error) {
     logger.error(error);
     throw error;

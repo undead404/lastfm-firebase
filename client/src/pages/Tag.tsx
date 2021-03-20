@@ -1,16 +1,20 @@
-import { Alert, List, Typography } from 'antd';
-import { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import AlbumCard from '../components/AlbumCard';
+import { Alert, Layout, List, ListProps, Typography } from 'antd';
+import isError from 'lodash/isError';
+import property from 'lodash/property';
+import { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router';
 
-import getTag from '../https-callables/get-tag';
+import AlbumItem from '../components/AlbumItem';
 import { Album, Tag } from '../misc/types';
+import { setCurrentTagByName } from '../redux/actions/tag';
+import { RootState } from '../redux/reducers';
 
 export interface TagParameters {
   tagName: string;
 }
 
-const LIST_GRID_CONFIG = {
+const LIST_GRID_CONFIG: ListProps<Tag>['grid'] = {
   gutter: 24,
   lg: 2,
   md: 1,
@@ -21,28 +25,22 @@ const LIST_GRID_CONFIG = {
 };
 
 export default function TagPage(): JSX.Element {
-  const [isLoading, setIsLoading] = useState(false);
   const { tagName } = useParams<TagParameters>();
-  const [error, setError] = useState<Error | undefined>();
-  const [tag, setTag] = useState<Tag | null>(null);
+  const dispatch = useDispatch();
+  const error = useSelector<RootState, Error | string>(property('tags.error'));
+  const isLoading = useSelector<RootState, boolean>(property('tags.isLoading'));
+  const tag = useSelector<RootState, Tag>(property('tags.currentTag'));
   useEffect(() => {
-    setIsLoading(true);
-    getTag(tagName)
-      .then(setTag)
-      .finally(() => setIsLoading(false))
-      .catch(setError);
-  }, [tagName]);
-  const renderAlbum = useCallback(
-    (album: Album, index: number) => (
-      <List.Item>
-        <AlbumCard album={album} index={index} />
-      </List.Item>
-    ),
-    [],
-  );
+    dispatch(setCurrentTagByName(tagName));
+  }, [dispatch, tagName]);
+  const renderAlbum = useCallback((album: Album, index: number) => {
+    return <AlbumItem album={album} index={index} />;
+  }, []);
   return (
-    <>
-      {error && <Alert message={error.message} type="error" />}
+    <Layout>
+      {error && (
+        <Alert message={isError(error) ? error.message : error} type="error" />
+      )}
       <List
         bordered
         dataSource={tag?.topAlbums || undefined}
@@ -51,9 +49,10 @@ export default function TagPage(): JSX.Element {
         header={
           <Typography.Title level={1}>Best {tagName} albums.</Typography.Title>
         }
+        itemLayout="vertical"
         loading={isLoading}
         renderItem={renderAlbum}
       />
-    </>
+    </Layout>
   );
 }

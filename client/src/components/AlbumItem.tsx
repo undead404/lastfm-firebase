@@ -1,53 +1,45 @@
-import { Card, Image, Spin, Typography } from 'antd';
+import { Image, List, Spin, Typography } from 'antd';
 import filter from 'lodash/filter';
 import map from 'lodash/map';
 import sortBy from 'lodash/sortBy';
 import toPairs from 'lodash/toPairs';
-import { CSSProperties } from 'react';
 
 import { Album } from '../misc/types';
 
-import styles from './AlbumCard.module.css';
+import styles from './AlbumItem.module.css';
 import TagBadge from './TagBadge';
 
-const TAG_COUNT_LIMIT = 50;
-
-export interface AlbumCardProperties {
+export interface AlbumItemProperties {
   album: Album;
   index: number;
 }
 
-const CARD_BODY_STYLE: CSSProperties = {
-  flexGrow: 0,
-};
-
 const ELLIPSIS_CONFIG = {
   rows: 2,
 };
+const TAG_COUNT_LIMIT = 50;
 
-export default function AlbumCard({
+export default function AlbumItem({
   album,
   index,
-}: AlbumCardProperties): JSX.Element {
+}: AlbumItemProperties): JSX.Element {
   const title = `${album.artist} - ${album.name}`;
   return (
-    <Card
-      bodyStyle={CARD_BODY_STYLE}
-      className={styles.albumCard}
-      cover={
+    <List.Item
+      className={styles.root}
+      extra={
         <Image
           alt={title}
-          fallback="https://via.placeholder.com/500"
+          className={styles.image}
           //   height={500}
           placeholder={<Spin spinning tip={title} />}
           preview={false}
-          src={album.cover || 'https://via.placeholder.com/500'}
+          src={album.cover || 'https://via.placeholder.com/125'}
           //   width={500}
-          wrapperClassName={styles.imageWrapper}
         />
       }
     >
-      <Card.Meta
+      <List.Item.Meta
         description={
           <>
             {album.date && (
@@ -62,7 +54,7 @@ export default function AlbumCard({
                     toPairs(album.tags || {}),
                     ([, tagCount]) => tagCount > TAG_COUNT_LIMIT,
                   ),
-                  [([, tagCount]) => -tagCount, ([tagName]) => tagName],
+                  [([, tagCount]) => -tagCount, ([name]) => name],
                 ),
                 ([albumTagName, albumTagCount]) => (
                   <TagBadge count={albumTagCount} name={albumTagName} />
@@ -74,12 +66,12 @@ export default function AlbumCard({
         title={
           <>
             {index + 1}.{' '}
-            <Typography.Text className={styles.albumTitle} copyable>
+            <Typography.Text className={styles.title} copyable>
               {title}
             </Typography.Text>
           </>
         }
       />
-    </Card>
+    </List.Item>
   );
 }

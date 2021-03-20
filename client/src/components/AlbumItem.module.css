@@ -1,0 +1,11 @@
+.image {
+    max-height: 125px;
+    width: auto;
+}
+
+.root {
+    display: flex!important;
+}
+.title {
+    white-space: initial;
+}

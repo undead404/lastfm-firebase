@@ -1,13 +1,14 @@
-import { Tag as AntDTag, Typography } from 'antd';
+import { Tag as AntDTag } from 'antd';
 import { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+
+import Link from './Link';
 
 export interface TagBadgeProperties {
   count: number;
   name: string;
 }
 
-const BASIC_FONT_SIZE = 24;
+const BASIC_FONT_SIZE = 18;
 
 const PERCENTS = 100;
 
@@ -22,7 +23,7 @@ export default function TagBadge({
     [count],
   );
   return (
-    <Link component={Typography.Link} to={`/tag/${name}`}>
+    <Link href={`/tag/${name}`}>
       <AntDTag style={style}>{name}</AntDTag>
     </Link>
   );
