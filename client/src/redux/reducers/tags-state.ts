@@ -5,6 +5,7 @@ export default interface TagsState {
   currentTags: Tag[];
   error: null | Error;
   isLoading: boolean;
+  pageNumber: number;
   tags: Tag[];
   total: number;
 }

@@ -1,52 +1,49 @@
 import { logger } from 'firebase-functions';
 import head from 'lodash/head';
-import { WithId } from 'mongodb';
 
 import mongodb from '../common/mongo-database';
 import { TagRecord, Weighted } from '../common/types';
 
-export type PickedTag = Pick<WithId<TagRecord>, '_id' | 'name' | 'power'>;
-
-export default async function pickTag(): Promise<PickedTag | undefined> {
-  let [tag]: (PickedTag | undefined)[] = (await mongodb.tags
+export default async function pickTag(): Promise<TagRecord | undefined> {
+  let [tag]: (TagRecord | undefined)[] = (await mongodb.tags
     .find({
       listCreatedAt: null,
     })
-    .project<PickedTag>({
-      _id: true,
-      name: true,
-      power: true,
-    })
     .sort({ power: -1 })
     .limit(1)
-    .toArray()) as PickedTag[];
+    .toArray()) as TagRecord[];
   if (tag) {
     logger.info(`Picked tag: ${tag.name}`);
     return tag;
   }
   tag = head(
     await mongodb.tags
-      .find()
-      .project<Weighted<PickedTag>>({
-        _id: true,
-        name: true,
-        power: true,
-        weight: {
-          $multiply: [
-            {
-              $toLong: {
-                $subtract: [
-                  '$$NOW',
-                  { $ifNull: ['$listCreatedAt', Date.parse('1970-01-01')] },
-                ],
-              },
+      .aggregate<Weighted<TagRecord>>([
+        {
+          $match: {
+            _id: true,
+            lastProcessedAt: true,
+            listCreatedAt: true,
+            name: true,
+            power: true,
+            weight: {
+              $multiply: [
+                {
+                  $toLong: {
+                    $subtract: [
+                      '$$NOW',
+                      { $ifNull: ['$listCreatedAt', Date.parse('1970-01-01')] },
+                    ],
+                  },
+                },
+                '$power',
+              ],
             },
-            '$power',
-          ],
+          },
         },
-      })
-      .sort({ weight: -1 })
-      .limit(1)
+        { $sort: { weight: -1 } },
+        { $limit: 1 },
+      ])
       .toArray(),
   );
   if (!tag) {

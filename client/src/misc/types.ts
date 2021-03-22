@@ -1,3 +1,5 @@
+import firebase from 'firebase/app';
+
 export interface Album {
   artist: string;
   cover: string | null;
@@ -18,4 +20,9 @@ export interface Tag {
 export type SerializableTag = Omit<Tag, 'lastProcessedAt' | 'listCreatedAt'> & {
   lastProcessedAt: null | string;
   listCreatedAt: null | string;
+};
+
+export type FirebaseTag = Omit<Tag, 'lastProcessedAt' | 'listCreatedAt'> & {
+  lastProcessedAt: null | firebase.firestore.Timestamp;
+  listCreatedAt: null | firebase.firestore.Timestamp;
 };

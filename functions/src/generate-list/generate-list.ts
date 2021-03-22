@@ -23,45 +23,60 @@ export default async function generateList(): Promise<void> {
     return;
   }
   let albums: Weighted<AlbumRecord>[] | null = await mongodb.albums
-    .find({
-      [`tags.${tagRecord.name}`]: {
-        $gt: 0,
+    .aggregate<Weighted<AlbumRecord>>([
+      {
+        $match: {
+          [`tags.${tagRecord.name}`]: {
+            $gt: 0,
+          },
+        },
       },
-    })
-    .project<Weighted<AlbumRecord>>({
-      artist: true,
-      cover: true,
-      date: true,
-      duration: true,
-      listeners: true,
-      mbid: true,
-      name: true,
-      numberOfTracks: true,
-      playcount: true,
-      tags: true,
-      thumbnail: true,
-      weight: {
-        $multiply: [
-          {
-            $divide: [
-              '$playcount',
-              { $ifNull: ['$numberOfTracks', AVERAGE_NUMBER_OF_TRACKS] },
+      {
+        $project: {
+          _id: false,
+          artist: true,
+          cover: true,
+          date: true,
+          duration: true,
+          listeners: true,
+          mbid: true,
+          name: true,
+          numberOfTracks: true,
+          playcount: true,
+          tags: true,
+          thumbnail: true,
+          weight: {
+            $multiply: [
+              {
+                $divide: [
+                  { $ifNull: ['$playcount', 0] },
+                  { $ifNull: ['$numberOfTracks', AVERAGE_NUMBER_OF_TRACKS] },
+                ],
+              },
+              { $ifNull: ['$listeners', 0] },
+              {
+                $divide: [
+                  { $ifNull: ['$duration', AVERAGE_ALBUM_DURATION] },
+                  { $ifNull: ['$numberOfTracks', AVERAGE_NUMBER_OF_TRACKS] },
+                ],
+              },
+              `$tags.${tagRecord.name}`,
             ],
           },
-          '$listeners',
-          {
-            $divide: [
-              { $ifNull: ['$duration', AVERAGE_ALBUM_DURATION] },
-              { $ifNull: ['$numberOfTracks', AVERAGE_NUMBER_OF_TRACKS] },
-            ],
-          },
-          `$tags.${tagRecord.name}`,
-        ],
+        },
       },
-    })
-    .sort({ weight: -1 })
-    .limit(LIST_LENGTH)
-    .sort({ date: 1 })
+      {
+        $sort: {
+          weight: -1,
+        },
+      },
+      { $limit: LIST_LENGTH },
+      {
+        $sort: {
+          date: 1,
+        },
+      },
+    ])
     .toArray();
   if (size(albums) < LIST_LENGTH) {
     logger.warn(`${size(albums)}, but required at least ${LIST_LENGTH}`);

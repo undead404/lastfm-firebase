@@ -33,7 +33,7 @@ export default function TagPreview({ tag }: TagPreviewProperties): JSX.Element {
     }
     return `Albums were scraped ${formatDistance(
       new Date(),
-      tag.listCreatedAt,
+      tag.lastProcessedAt,
     )} ago`;
   }, [tag.lastProcessedAt, tag.listCreatedAt]);
   return (

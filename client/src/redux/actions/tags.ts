@@ -1,21 +1,16 @@
-import { Dispatch } from 'redux';
-
 import {
   TAGS_ACQUIRE_FAILURE,
   TAGS_ACQUIRE_LOADING,
   TAGS_ACQUIRE_SUCCESS,
+  TAGS_SET_PAGE_NUMBER,
 } from '../constants';
-import getTags, { GetTagsResult } from '../../https-callables/get-tags';
-import { Tag } from '../../misc/types';
-
-const DEFAULT_TAGS_LIMIT = 12;
+import { FirebaseTag } from '../../misc/types';
 
 export interface TagsAcquireLoadingAction {
   type: typeof TAGS_ACQUIRE_LOADING;
 }
 export interface TagsAcquireSuccessAction {
-  tags: Tag[];
-  total: number;
+  tags: FirebaseTag[];
   type: typeof TAGS_ACQUIRE_SUCCESS;
 }
 
@@ -28,6 +23,11 @@ export type TagsAcquireAction =
   | TagsAcquireFailureAction
   | TagsAcquireLoadingAction
   | TagsAcquireSuccessAction;
+
+export interface TagsSetPageNumberAction {
+  pageNumber: number;
+  type: typeof TAGS_SET_PAGE_NUMBER;
+}
 
 export function setTagsAcquireFailure(
   error: string | Error,
@@ -45,25 +45,17 @@ export function setTagsAcquireLoading(): TagsAcquireLoadingAction {
 }
 
 export function setTagsAcquireSuccess(
-  getTagsResponse: GetTagsResult,
+  tags: FirebaseTag[],
 ): TagsAcquireSuccessAction {
   return {
-    tags: getTagsResponse.tags,
-    total: getTagsResponse.total,
+    tags,
     type: TAGS_ACQUIRE_SUCCESS,
   };
 }
 
-export function acquireTags(offset = 0, limit = DEFAULT_TAGS_LIMIT) {
-  return async (
-    dispatch: Dispatch<TagsAcquireAction>,
-  ): Promise<TagsAcquireAction> => {
-    dispatch(setTagsAcquireLoading());
-    try {
-      const response = await getTags({ limit, offset });
-      return dispatch(setTagsAcquireSuccess(response));
-    } catch (error) {
-      return dispatch(setTagsAcquireFailure(error));
-    }
+export function setTagsPageNumber(pageNumber: number): TagsSetPageNumberAction {
+  return {
+    pageNumber,
+    type: TAGS_SET_PAGE_NUMBER,
   };
 }

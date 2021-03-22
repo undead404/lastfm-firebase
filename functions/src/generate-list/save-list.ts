@@ -1,21 +1,19 @@
-import { UpdateWriteOpResult } from 'mongodb';
+import { firestore } from 'firebase-admin';
+import omit from 'lodash/omit';
+import encodeFirebaseKey from '../common/encode-firebase-key';
 
-import mongodb from '../common/mongo-database';
 import { AlbumRecord, TagRecord } from '../common/types';
 
 export default function saveList(
-  tagRecord: Pick<TagRecord, 'name'>,
+  tagRecord: TagRecord,
   albums: AlbumRecord[] | null,
-): Promise<UpdateWriteOpResult> {
-  const tagUpdate: Partial<TagRecord> = {
-    topAlbums: albums,
-    listCreatedAt: new Date(),
-  };
-  return mongodb.tags.updateOne(
-    { name: tagRecord.name },
-    { $set: tagUpdate },
-    {
-      upsert: true,
-    },
-  );
+): Promise<firestore.WriteResult> {
+  return firestore()
+    .collection('tags')
+    .doc(encodeFirebaseKey(tagRecord.name))
+    .set({
+      ...omit(tagRecord, ['_id']),
+      topAlbums: albums,
+      listCreatedAt: firestore.FieldValue.serverTimestamp(),
+    });
 }

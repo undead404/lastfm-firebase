@@ -22,30 +22,40 @@ export default async function scrapeAlbums(): Promise<void> {
   if (!tag) {
     tag = head(
       await mongodb.tags
-        .find()
-        .project<Weighted<TagRecord>>({
-          name: true,
-          lastProcessedAt: true,
-          listCreatedAt: true,
-          power: true,
-          weight: {
-            $multiply: [
-              {
-                $toLong: {
-                  $subtract: [
-                    '$$NOW',
-                    { $ifNull: ['$lastProcessedAt', Date.parse('2021-03-17')] },
-                  ],
-                },
+        .aggregate<Weighted<TagRecord>>([
+          {
+            $match: {
+              name: true,
+              lastProcessedAt: true,
+              listCreatedAt: true,
+              power: true,
+              weight: {
+                $multiply: [
+                  {
+                    $toLong: {
+                      $subtract: [
+                        '$$NOW',
+                        {
+                          $ifNull: [
+                            '$lastProcessedAt',
+                            Date.parse('2021-03-17'),
+                          ],
+                        },
+                      ],
+                    },
+                  },
+                  '$power',
+                ],
               },
-              '$power',
-            ],
+            },
           },
-        })
-        .sort({
-          weight: -1,
-        })
-        .limit(1)
+          {
+            $sort: {
+              weight: -1,
+            },
+          },
+          { $limit: 1 },
+        ])
         .toArray(),
     );
   }

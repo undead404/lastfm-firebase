@@ -1,13 +1,13 @@
 import { Alert, Layout, List, ListProps, Typography } from 'antd';
 import isError from 'lodash/isError';
 import property from 'lodash/property';
-import { useCallback, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useCallback } from 'react';
+import { useSelector } from 'react-redux';
 import { useParams } from 'react-router';
 
 import AlbumItem from '../components/AlbumItem';
+import useTag from '../hooks/use-tag';
 import { Album, Tag } from '../misc/types';
-import { setCurrentTagByName } from '../redux/actions/tag';
 import { RootState } from '../redux/reducers';
 
 export interface TagParameters {
@@ -26,13 +26,9 @@ const LIST_GRID_CONFIG: ListProps<Tag>['grid'] = {
 
 export default function TagPage(): JSX.Element {
   const { tagName } = useParams<TagParameters>();
-  const dispatch = useDispatch();
   const error = useSelector<RootState, Error | string>(property('tags.error'));
   const isLoading = useSelector<RootState, boolean>(property('tags.isLoading'));
-  const tag = useSelector<RootState, Tag>(property('tags.currentTag'));
-  useEffect(() => {
-    dispatch(setCurrentTagByName(tagName));
-  }, [dispatch, tagName]);
+  const tag = useTag(tagName);
   const renderAlbum = useCallback((album: Album, index: number) => {
     return <AlbumItem album={album} index={index} />;
   }, []);

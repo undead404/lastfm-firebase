@@ -8,10 +8,11 @@ import { useCallback, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import TagPreview from '../components/TagPreview';
-import useLogChanges from '../hooks/use-log-changes';
+import useTags from '../hooks/use-tags';
+import { DEFAULT_TAGS_LIMIT } from '../misc/constants';
 import { Tag } from '../misc/types';
+import { setTagsPageNumber } from '../redux/actions/tags';
 import { RootState } from '../redux/reducers';
-import { acquireTags } from '../redux/actions/tags';
 
 const LIST_GRID_CONFIG = {
   gutter: 24,
@@ -23,22 +24,21 @@ const LIST_GRID_CONFIG = {
   xxl: 6,
 };
 
-const TAGS_PER_PAGE = 12;
-
 export default function Home(): JSX.Element {
   const dispatch = useDispatch();
   const error = useSelector<RootState, Error | string>(property('tags.error'));
   const isLoading = useSelector<RootState, boolean>(property('tags.isLoading'));
-  const tags = useSelector<RootState, Tag[]>(property('tags.currentTags'));
+  useTags();
+  const currentTags = useSelector<RootState, Tag[]>(
+    property('tags.currentTags'),
+  );
   const total = useSelector<RootState, number>(property('tags.total'));
-  const page =
-    useSelector<RootState, string>(property('router.location.query.page')) ||
-    '1';
-  useLogChanges('Home', 'page', page);
-  const pageNumber = toNumber(page);
-  useLogChanges('Home', 'pageNumber', pageNumber);
+  const page = useSelector<RootState, string>(
+    property('router.location.query.page'),
+  );
+  const pageNumber = toNumber(page) || 1;
   useEffect(() => {
-    dispatch(acquireTags((pageNumber - 1) * TAGS_PER_PAGE, TAGS_PER_PAGE));
+    dispatch(setTagsPageNumber(pageNumber));
   }, [dispatch, pageNumber]);
   const renderTag = useCallback(
     (tag: Tag) => (
@@ -51,11 +51,11 @@ export default function Home(): JSX.Element {
   const pagination = useMemo<ListProps<Tag>['pagination']>(
     () => ({
       current: pageNumber,
-      disabled: total <= TAGS_PER_PAGE,
+      disabled: total <= DEFAULT_TAGS_LIMIT,
       onChange: (nextPage) => {
         dispatch(push(`/?${stringify({ page: nextPage })}`));
       },
-      pageSize: TAGS_PER_PAGE,
+      pageSize: DEFAULT_TAGS_LIMIT,
       position: 'both',
       showSizeChanger: false,
       showTitle: true,
@@ -70,11 +70,19 @@ export default function Home(): JSX.Element {
       )}
       <List
         bordered
-        dataSource={tags || undefined}
-        footer={<Typography.Text>More coming</Typography.Text>}
+        dataSource={currentTags || undefined}
+        footer={
+          <Typography.Paragraph>
+            <Typography.Text>More coming</Typography.Text>
+          </Typography.Paragraph>
+        }
         grid={LIST_GRID_CONFIG}
         header={
-          <Typography.Title level={1}>Available genre charts</Typography.Title>
+          <Typography.Paragraph>
+            <Typography.Title level={1}>
+              Available genre charts
+            </Typography.Title>
+          </Typography.Paragraph>
         }
         loading={isLoading}
         pagination={pagination}
