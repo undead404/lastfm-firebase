@@ -32,6 +32,10 @@ export default function TagPage(): JSX.Element {
   const renderAlbum = useCallback((album: Album, index: number) => {
     return <AlbumItem album={album} index={index} />;
   }, []);
+  const rowKey = useCallback(
+    (album: Album) => `${album.artist} - ${album.name}`,
+    [],
+  );
   return (
     <Layout>
       {error && (
@@ -48,6 +52,7 @@ export default function TagPage(): JSX.Element {
         itemLayout="vertical"
         loading={isLoading}
         renderItem={renderAlbum}
+        rowKey={rowKey}
       />
     </Layout>
   );

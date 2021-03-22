@@ -1,5 +1,6 @@
 import { Image, List, Spin, Typography } from 'antd';
 import filter from 'lodash/filter';
+import isUndefined from 'lodash/isUndefined';
 import map from 'lodash/map';
 import sortBy from 'lodash/sortBy';
 import toPairs from 'lodash/toPairs';
@@ -24,6 +25,12 @@ export default function AlbumItem({
   index,
 }: AlbumItemProperties): JSX.Element {
   const title = `${album.artist} - ${album.name}`;
+  let dateString = 'Processing...';
+  if (album.date) {
+    dateString = album.date;
+  } else if (isUndefined(album.date)) {
+    dateString = 'Unknown';
+  }
   return (
     <List.Item
       className={styles.root}
@@ -42,11 +49,9 @@ export default function AlbumItem({
       <List.Item.Meta
         description={
           <>
-            {album.date && (
-              <Typography.Paragraph>
-                Released at: {album.date}
-              </Typography.Paragraph>
-            )}
+            <Typography.Paragraph>
+              Released at: {dateString}
+            </Typography.Paragraph>
             <Typography.Paragraph ellipsis={ELLIPSIS_CONFIG}>
               {map(
                 sortBy(
