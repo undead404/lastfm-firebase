@@ -1,10 +1,10 @@
 export interface Album {
   artist: string;
-  cover: string | null;
-  date: string | null;
+  cover?: string | null;
+  date?: string | null;
   name: string;
   tags: Record<string, number> | null;
-  thumbnail: string | null;
+  thumbnail?: string | null;
 }
 
 export interface Tag {
