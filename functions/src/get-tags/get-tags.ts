@@ -24,8 +24,8 @@ export default async function getTags({
   if (!mongodb.isConnected) {
     await mongodb.connect();
   }
-  const result: GetTagsResponse = {
-    tags: await mongodb.tags
+  const [tags, total] = await Promise.all([
+    mongodb.tags
       .find({
         topAlbums: { $ne: null },
       })
@@ -51,7 +51,11 @@ export default async function getTags({
       .skip(offset)
       .limit(limit)
       .toArray(),
-    total: await countTags(),
+    countTags(),
+  ]);
+  const result: GetTagsResponse = {
+    tags,
+    total,
   };
   return result;
 }

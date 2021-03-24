@@ -20,14 +20,25 @@ export default async function getStats(): Promise<Stats> {
   if (!mongoDatabase.isConnected) {
     await mongoDatabase.connect();
   }
+  const [
+    albumStatsByCover,
+    albumStatsByDate,
+    tagsStatsByListGeneration,
+    tagsStatsByProcessing,
+  ] = await Promise.all([
+    getAlbumsStatsByCover(),
+    getAlbumsStatsByDate(),
+    getTagsStatsByListGeneration(),
+    getTagsStatsByProcessing(),
+  ]);
   return {
     albums: {
-      byCover: await getAlbumsStatsByCover(),
-      byDate: await getAlbumsStatsByDate(),
+      byCover: albumStatsByCover,
+      byDate: albumStatsByDate,
     },
     tags: {
-      byListGeneration: await getTagsStatsByListGeneration(),
-      byProcessing: await getTagsStatsByProcessing(),
+      byListGeneration: tagsStatsByListGeneration,
+      byProcessing: tagsStatsByProcessing,
     },
   };
 }

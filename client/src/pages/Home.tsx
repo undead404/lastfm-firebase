@@ -83,6 +83,7 @@ export default function Home(): JSX.Element {
         header={
           <Space>
             <Button
+              disabled={isLoading}
               icon={<RedoOutlined />}
               onClick={handleRefresh}
               shape="circle"

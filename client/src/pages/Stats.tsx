@@ -72,7 +72,7 @@ export default function StatsPage(): JSX.Element {
           />
         )}
         <Row gutter={24}>
-          <Col span={12}>
+          <Col lg={12} md={12} sm={12} xl={6} xs={24} xxl={6}>
             <Card bordered={false} title="Tags' stats by albums' scraping">
               <Spin spinning={isLoading}>
                 <VictoryPie
@@ -85,7 +85,7 @@ export default function StatsPage(): JSX.Element {
               </Spin>
             </Card>
           </Col>
-          <Col span={12}>
+          <Col lg={12} md={12} sm={12} xl={6} xs={24} xxl={6}>
             <Card bordered={false} title="Tags' stats by lists' generation">
               <Spin spinning={isLoading}>
                 <VictoryPie
@@ -98,9 +98,7 @@ export default function StatsPage(): JSX.Element {
               </Spin>
             </Card>
           </Col>
-        </Row>
-        <Row gutter={24}>
-          <Col span={12}>
+          <Col lg={12} md={12} sm={12} xl={6} xs={24} xxl={6}>
             <Card
               bordered={false}
               title="Albums' stats by covers' availability"
@@ -116,7 +114,7 @@ export default function StatsPage(): JSX.Element {
               </Spin>
             </Card>
           </Col>
-          <Col span={12}>
+          <Col lg={12} md={12} sm={12} xl={6} xs={24} xxl={6}>
             <Card bordered={false} title="Albums' stats by dates' availability">
               <Spin spinning={isLoading}>
                 <VictoryPie
