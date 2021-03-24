@@ -1,16 +1,19 @@
+import { Dispatch } from 'redux';
 import {
   TAGS_ACQUIRE_FAILURE,
   TAGS_ACQUIRE_LOADING,
   TAGS_ACQUIRE_SUCCESS,
-  TAGS_SET_PAGE_NUMBER,
 } from '../constants';
-import { FirebaseTag } from '../../misc/types';
+import { SerializableTag } from '../../misc/types';
+import getTags, { GetTagsResponse } from '../../https-callables/get-tags';
+import { DEFAULT_TAGS_LIMIT } from '../../misc/constants';
 
 export interface TagsAcquireLoadingAction {
   type: typeof TAGS_ACQUIRE_LOADING;
 }
 export interface TagsAcquireSuccessAction {
-  tags: FirebaseTag[];
+  tags: SerializableTag[];
+  total: number;
   type: typeof TAGS_ACQUIRE_SUCCESS;
 }
 
@@ -23,11 +26,6 @@ export type TagsAcquireAction =
   | TagsAcquireFailureAction
   | TagsAcquireLoadingAction
   | TagsAcquireSuccessAction;
-
-export interface TagsSetPageNumberAction {
-  pageNumber: number;
-  type: typeof TAGS_SET_PAGE_NUMBER;
-}
 
 export function setTagsAcquireFailure(
   error: string | Error,
@@ -45,17 +43,25 @@ export function setTagsAcquireLoading(): TagsAcquireLoadingAction {
 }
 
 export function setTagsAcquireSuccess(
-  tags: FirebaseTag[],
+  getTagsResponse: GetTagsResponse,
 ): TagsAcquireSuccessAction {
   return {
-    tags,
+    tags: getTagsResponse.tags,
+    total: getTagsResponse.total,
     type: TAGS_ACQUIRE_SUCCESS,
   };
 }
 
-export function setTagsPageNumber(pageNumber: number): TagsSetPageNumberAction {
-  return {
-    pageNumber,
-    type: TAGS_SET_PAGE_NUMBER,
+export function acquireTags(offset = 0, limit = DEFAULT_TAGS_LIMIT) {
+  return async (
+    dispatch: Dispatch<TagsAcquireAction>,
+  ): Promise<TagsAcquireAction> => {
+    dispatch(setTagsAcquireLoading());
+    try {
+      const response = await getTags({ limit, offset });
+      return dispatch(setTagsAcquireSuccess(response));
+    } catch (error) {
+      return dispatch(setTagsAcquireFailure(error));
+    }
   };
 }

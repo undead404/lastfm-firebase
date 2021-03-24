@@ -6,6 +6,11 @@
 .root {
     display: flex!important;
 }
+
+.spinWrapper {
+    height: 100%;
+}
+
 .title {
     white-space: initial;
 }

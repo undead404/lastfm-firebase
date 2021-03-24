@@ -1,17 +1,15 @@
 import compact from 'lodash/compact';
 import isError from 'lodash/isError';
 import map from 'lodash/map';
-import size from 'lodash/size';
-import deserializeFirebaseTag from '../../misc/deserialize-firebase-tag';
-import { FirebaseTag, Tag } from '../../misc/types';
+import deserializeTag from '../../misc/deserialize-tag';
+import { SerializableTag, Tag } from '../../misc/types';
 
 import { TagAcquireAction } from '../actions/tag';
-import { TagsAcquireAction, TagsSetPageNumberAction } from '../actions/tags';
+import { TagsAcquireAction } from '../actions/tags';
 import {
   TAGS_ACQUIRE_FAILURE,
   TAGS_ACQUIRE_LOADING,
   TAGS_ACQUIRE_SUCCESS,
-  TAGS_SET_PAGE_NUMBER,
   TAG_ACQUIRE_FAILURE,
   TAG_ACQUIRE_LOADING,
   TAG_SET_CURRENT,
@@ -29,11 +27,9 @@ const initialState: TagsState = {
   total: 0,
 };
 
-const DEFAULT_TAGS_LIMIT = 12;
-
 export default function reduceTags(
   state = initialState,
-  action: TagAcquireAction | TagsAcquireAction | TagsSetPageNumberAction,
+  action: TagAcquireAction | TagsAcquireAction,
 ): TagsState {
   switch (action.type) {
     case TAG_ACQUIRE_FAILURE:
@@ -52,7 +48,7 @@ export default function reduceTags(
     case TAG_SET_CURRENT:
       return {
         ...state,
-        currentTag: deserializeFirebaseTag(action.tag),
+        currentTag: action.tag ? deserializeTag(action.tag) : null,
         error: null,
         isLoading: false,
       };
@@ -70,29 +66,16 @@ export default function reduceTags(
       };
     case TAGS_ACQUIRE_SUCCESS: {
       const tags = compact(
-        map<FirebaseTag, Tag | null>(action.tags, deserializeFirebaseTag),
+        map<SerializableTag, Tag | null>(action.tags, deserializeTag),
       );
       return {
         ...state,
-        currentTags: tags.slice(
-          DEFAULT_TAGS_LIMIT * (state.pageNumber - 1),
-          DEFAULT_TAGS_LIMIT * state.pageNumber,
-        ),
+        currentTags: tags,
         error: null,
         isLoading: false,
-        tags,
-        total: size(tags),
+        total: action.total,
       };
     }
-    case TAGS_SET_PAGE_NUMBER:
-      return {
-        ...state,
-        currentTags: state.tags.slice(
-          DEFAULT_TAGS_LIMIT * (action.pageNumber - 1),
-          DEFAULT_TAGS_LIMIT * action.pageNumber,
-        ),
-        pageNumber: action.pageNumber,
-      };
     default:
       return state;
   }

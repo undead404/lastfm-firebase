@@ -1,28 +1,17 @@
-import invokeMap from 'lodash/invokeMap';
+import property from 'lodash/property';
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-import { firestore } from '../misc/firebase-app';
-import {
-  setTagsAcquireFailure,
-  setTagsAcquireLoading,
-  setTagsAcquireSuccess,
-} from '../redux/actions/tags';
+import { DEFAULT_TAGS_LIMIT } from '../misc/constants';
+import { Tag } from '../misc/types';
+import { acquireTags } from '../redux/actions/tags';
+import { RootState } from '../redux/reducers';
 
-export default function useTags(): void {
+export default function useTags(pageNumber: number): Tag[] {
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(setTagsAcquireLoading());
-    const unsubscribe = firestore
-      .collection('tags')
-      .orderBy('power', 'desc')
-      .onSnapshot((snapshot) => {
-        try {
-          dispatch(setTagsAcquireSuccess(invokeMap(snapshot.docs, 'data')));
-        } catch (error) {
-          dispatch(setTagsAcquireFailure(error));
-        }
-      });
-    return () => unsubscribe();
-  }, []);
+    dispatch(acquireTags(DEFAULT_TAGS_LIMIT * (pageNumber - 1)));
+  }, [dispatch, pageNumber]);
+  const tags = useSelector<RootState, Tag[]>(property('tags.currentTags'));
+  return tags;
 }

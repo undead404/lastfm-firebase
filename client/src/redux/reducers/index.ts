@@ -9,10 +9,13 @@ import {
   StateFromReducersMapObject,
 } from 'redux';
 
+import statsReducer from './stats';
 import tagsReducer from './tags';
 import TagsState from './tags-state';
 import { TagAcquireAction } from '../actions/tag';
 import { TagsAcquireAction } from '../actions/tags';
+import StatsState from './stats-state';
+import { StatsAcquireAction } from '../actions/stats';
 
 export default function createRootReducer(
   history: History<LocationState>,
@@ -20,16 +23,19 @@ export default function createRootReducer(
   CombinedState<
     StateFromReducersMapObject<{
       router: Reducer<RouterState<LocationState>, AnyAction>;
+      stats: Reducer<StatsState, StatsAcquireAction>;
       tags: Reducer<TagsState, TagAcquireAction | TagsAcquireAction>;
     }>
   >,
   ActionFromReducersMapObject<{
     router: Reducer<RouterState<LocationState>, AnyAction>;
+    stats: Reducer<StatsState, StatsAcquireAction>;
     tags: Reducer<TagsState, TagAcquireAction | TagsAcquireAction>;
   }>
 > {
   return combineReducers({
     router: connectRouter(history),
+    stats: statsReducer,
     tags: tagsReducer,
   });
 }

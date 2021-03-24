@@ -27,6 +27,7 @@ export default async function storeTags(
         listCreatedAt: null,
         name: tagName,
         power: tagCount,
+        topAlbums: null,
       };
       return { insertOne: { document: tagRecord } };
     },

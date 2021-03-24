@@ -1,6 +1,6 @@
 import firebase from 'firebase/app';
 // eslint-disable-next-line import/no-duplicates
-import 'firebase/firestore';
+import 'firebase/functions';
 // eslint-disable-next-line import/no-duplicates
 import 'firebase/performance';
 
@@ -13,5 +13,5 @@ const firebaseApp = firebase.initializeApp({
   storageBucket: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.appspot.com`,
 });
 
-export const firestore = firebaseApp.firestore();
+export const functions = firebaseApp.functions();
 export const performance = firebaseApp.performance();

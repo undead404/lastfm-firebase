@@ -1,20 +1,29 @@
-import { Alert, List, Layout, ListProps, Typography } from 'antd';
+import { RedoOutlined } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  List,
+  Layout,
+  ListProps,
+  Space,
+  Typography,
+} from 'antd';
 import { push } from 'connected-react-router';
 import isError from 'lodash/isError';
 import property from 'lodash/property';
-import toNumber from 'lodash/toNumber';
 import { stringify } from 'query-string';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import TagPreview from '../components/TagPreview';
+import usePageNumber from '../hooks/use-page-number';
 import useTags from '../hooks/use-tags';
 import { DEFAULT_TAGS_LIMIT } from '../misc/constants';
 import { Tag } from '../misc/types';
-import { setTagsPageNumber } from '../redux/actions/tags';
+import { acquireTags } from '../redux/actions/tags';
 import { RootState } from '../redux/reducers';
 
-const LIST_GRID_CONFIG = {
+const LIST_GRID_CONFIG: ListProps<Tag>['grid'] = {
   gutter: 24,
   lg: 3,
   md: 3,
@@ -28,18 +37,9 @@ export default function Home(): JSX.Element {
   const dispatch = useDispatch();
   const error = useSelector<RootState, Error | string>(property('tags.error'));
   const isLoading = useSelector<RootState, boolean>(property('tags.isLoading'));
-  useTags();
-  const currentTags = useSelector<RootState, Tag[]>(
-    property('tags.currentTags'),
-  );
   const total = useSelector<RootState, number>(property('tags.total'));
-  const page = useSelector<RootState, string>(
-    property('router.location.query.page'),
-  );
-  const pageNumber = toNumber(page) || 1;
-  useEffect(() => {
-    dispatch(setTagsPageNumber(pageNumber));
-  }, [dispatch, pageNumber]);
+  const pageNumber = usePageNumber();
+  const tags = useTags(pageNumber);
   const renderTag = useCallback(
     (tag: Tag) => (
       <List.Item>
@@ -63,6 +63,9 @@ export default function Home(): JSX.Element {
     }),
     [dispatch, pageNumber, total],
   );
+  const handleRefresh = useCallback(() => {
+    dispatch(acquireTags(DEFAULT_TAGS_LIMIT * (pageNumber - 1)));
+  }, [dispatch, pageNumber]);
   return (
     <Layout>
       {error && (
@@ -70,7 +73,7 @@ export default function Home(): JSX.Element {
       )}
       <List
         bordered
-        dataSource={currentTags || undefined}
+        dataSource={tags || undefined}
         footer={
           <Typography.Paragraph>
             <Typography.Text>More coming</Typography.Text>
@@ -78,11 +81,19 @@ export default function Home(): JSX.Element {
         }
         grid={LIST_GRID_CONFIG}
         header={
-          <Typography.Paragraph>
+          <Space>
+            <Button
+              icon={<RedoOutlined />}
+              onClick={handleRefresh}
+              shape="circle"
+              size="large"
+              title="Refresh"
+              type="ghost"
+            />
             <Typography.Title level={1}>
               Available genre charts
             </Typography.Title>
-          </Typography.Paragraph>
+          </Space>
         }
         loading={isLoading}
         pagination={pagination}

@@ -10,6 +10,7 @@ import { Tag } from '../misc/types';
 
 import Link from './Link';
 import QuatroImage from './QuatroImage';
+import styles from './TagPreview.module.css';
 
 export interface TagPreviewProperties {
   tag: Tag;
@@ -38,6 +39,7 @@ export default function TagPreview({ tag }: TagPreviewProperties): JSX.Element {
   }, [tag.lastProcessedAt, tag.listCreatedAt]);
   return (
     <Badge
+      className={styles.badge}
       count={
         ago ? (
           <Tooltip title={ago}>

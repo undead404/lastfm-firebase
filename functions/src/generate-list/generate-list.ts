@@ -6,7 +6,6 @@ import { AlbumRecord, Weighted } from '../common/types';
 
 import pickTag from './pick-tag';
 import saveList from './save-list';
-import updateTimestamp from './update-timestamp';
 
 const AVERAGE_NUMBER_OF_TRACKS = 7;
 const AVERAGE_SONG_DURATION = 210;
@@ -83,5 +82,4 @@ export default async function generateList(): Promise<void> {
     albums = null;
   }
   await saveList(tagRecord, albums);
-  await updateTimestamp(tagRecord);
 }

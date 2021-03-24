@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 export interface AlbumRecord {
   artist: string;
   cover?: null | string;
@@ -19,6 +17,7 @@ export interface TagRecord {
   lastProcessedAt: null | Date;
   listCreatedAt: null | Date;
   power: number;
+  topAlbums: AlbumRecord[] | null;
 }
 
 export type Weighted<T> = T & {
@@ -31,12 +30,4 @@ export type SerializableTag = Omit<
 > & {
   lastProcessedAt: null | string;
   listCreatedAt: null | string;
-};
-
-export type FirebaseTag = Omit<
-  TagRecord,
-  'lastProcessedAt' | 'listCreatedAt'
-> & {
-  lastProcessedAt: null | firestore.FieldValue | firestore.Timestamp;
-  listCreatedAt: null | firestore.FieldValue | firestore.Timestamp;
 };

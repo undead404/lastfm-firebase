@@ -39,7 +39,7 @@ export default function AlbumItem({
           alt={title}
           className={styles.image}
           //   height={500}
-          placeholder={<Spin spinning tip={title} />}
+          placeholder={<Spin spinning wrapperClassName={styles.spinWrapper} />}
           preview={false}
           src={album.cover || 'https://via.placeholder.com/125'}
           //   width={500}

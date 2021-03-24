@@ -1,13 +1,15 @@
 import firebase from 'firebase-admin';
-import { firestore, logger, pubsub, runWith } from 'firebase-functions';
+import { https, logger, pubsub, runWith } from 'firebase-functions';
 
-import generateListFunction from './generate-list/generate-list';
-import populateAlbumsCoversFunction from './populate-albums-covers/populate-albums-covers';
-import populateAlbumsDatesFunction from './populate-albums-dates/populate-albums-dates';
-import populateAlbumsStatsFunction from './populate-albums-stats/populate-albums-stats';
-import populateAlbumsTagsFunction from './populate-albums-tags/populate-albums-tags';
-import scrapeAlbumsFunction from './scrape-albums/scrape-albums';
-import handleTagWrite from './handle-tag-write/handle-tag-write';
+import generateListFunction from './generate-list';
+import getStatsFunction from './get-stats';
+import getTagFunction from './get-tag';
+import getTagsFunction from './get-tags';
+import populateAlbumsCoversFunction from './populate-albums-covers';
+import populateAlbumsDatesFunction from './populate-albums-dates';
+import populateAlbumsStatsFunction from './populate-albums-stats';
+import populateAlbumsTagsFunction from './populate-albums-tags';
+import scrapeAlbumsFunction from './scrape-albums';
 
 firebase.initializeApp();
 
@@ -31,6 +33,27 @@ export const generateList = pubsub
     }
   });
 
+export const getStats = https.onCall(() => getStatsFunction());
+
+export const getTag = https.onCall(async (data) => {
+  try {
+    return {
+      tag: await getTagFunction(data.tagName),
+    };
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
+
+export const getTags = https.onCall(async (data) => {
+  try {
+    return await getTagsFunction(data);
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
 export const populateAlbumsCovers = runWith({
   timeoutSeconds: 540,
 })
@@ -100,7 +123,3 @@ export const scrapeAlbums = runWith({
       throw error;
     }
   });
-
-export const tagWriteListener = firestore
-  .document('tags/{documentUid}')
-  .onWrite(handleTagWrite);

@@ -17,7 +17,6 @@
     "date-fns": "~2.19.0",
     "firebase-admin": "~9.5.0",
     "firebase-functions": "~3.13.2",
-    "ioredis": "~4.24.2",
     "lodash": "~4.17.21",
     "mongodb": "~3.6.5",
     "musicbrainz-api": "0.5.2",
