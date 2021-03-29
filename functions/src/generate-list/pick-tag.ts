@@ -8,6 +8,9 @@ export default async function pickTag(): Promise<TagRecord | undefined> {
   let [tag]: (TagRecord | undefined)[] = (await mongodb.tags
     .find({
       listCreatedAt: null,
+      lastProcessedAt: {
+        $ne: null,
+      },
     })
     .sort({ power: -1 })
     .limit(1)
@@ -20,7 +23,7 @@ export default async function pickTag(): Promise<TagRecord | undefined> {
     await mongodb.tags
       .aggregate<Weighted<TagRecord>>([
         {
-          $match: {
+          $project: {
             _id: true,
             lastProcessedAt: true,
             listCreatedAt: true,

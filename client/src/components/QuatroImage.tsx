@@ -1,4 +1,5 @@
 import { Image } from 'antd';
+import classnames from 'classnames';
 import head from 'lodash/head';
 import map from 'lodash/map';
 import size from 'lodash/size';
@@ -33,14 +34,14 @@ export default function QuatroImage({
   if (numberOfImages < NUMBER_OF_PREVIEWS) {
     return (
       <Image
-        className={styles.singleImage}
+        className={classnames(styles.singleImage, 'tag-image-preview')}
         preview={false}
         src={head(imagesSources) || `https://via.placeholder.com/${width}`}
       />
     );
   }
   return (
-    <div className={styles.wrapper}>
+    <div className={classnames(styles.wrapper, 'tag-image-preview')}>
       {map(take(imagesSources, NUMBER_OF_PREVIEWS), (imageSource, index) => (
         <Image
           className={styles.quarter}

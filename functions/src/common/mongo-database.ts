@@ -1,5 +1,5 @@
 import { logger } from 'firebase-functions';
-import { Collection, Db, MongoClient } from 'mongodb';
+import { Collection, Db, MongoClient, WithId } from 'mongodb';
 
 import {
   MONGODB_CLUSTER,
@@ -21,8 +21,8 @@ class MongoDatabase {
     });
   }
 
-  get albums(): Collection<AlbumRecord> {
-    return this.database.collection<AlbumRecord>('albums');
+  get albums(): Collection<WithId<AlbumRecord>> {
+    return this.database.collection<WithId<AlbumRecord>>('albums');
   }
 
   connect(): Promise<MongoClient> {
@@ -38,8 +38,8 @@ class MongoDatabase {
     return this.client.isConnected();
   }
 
-  get tags(): Collection<TagRecord> {
-    return this.database.collection<TagRecord>('tags');
+  get tags(): Collection<WithId<TagRecord>> {
+    return this.database.collection<WithId<TagRecord>>('tags');
   }
 }
 

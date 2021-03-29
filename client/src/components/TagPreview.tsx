@@ -43,12 +43,12 @@ export default function TagPreview({ tag }: TagPreviewProperties): JSX.Element {
       count={
         ago ? (
           <Tooltip title={ago}>
-            <CheckCircleTwoTone twoToneColor="#52c41a" />
+            <CheckCircleTwoTone className="reliable" twoToneColor="#52c41a" />
           </Tooltip>
         ) : null
       }
     >
-      <Link href={`/tag/${tag.name}`}>
+      <Link className="tag-list-item" href={`/tag/${tag.name}`}>
         <Card
           cover={
             <QuatroImage
@@ -66,7 +66,9 @@ export default function TagPreview({ tag }: TagPreviewProperties): JSX.Element {
                 </Typography.Paragraph>
               ) : null
             }
-            title={<Typography.Text>{tag.name}</Typography.Text>}
+            title={
+              <Typography.Text className="tag-name">{tag.name}</Typography.Text>
+            }
           />
         </Card>
       </Link>

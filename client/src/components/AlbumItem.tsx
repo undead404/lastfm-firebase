@@ -1,13 +1,15 @@
-import { Image, List, Spin, Typography } from 'antd';
+import { Button, Image, List, Spin, Tag, Typography } from 'antd';
 import filter from 'lodash/filter';
 import isUndefined from 'lodash/isUndefined';
 import map from 'lodash/map';
 import sortBy from 'lodash/sortBy';
 import toPairs from 'lodash/toPairs';
+import { useCallback, useState } from 'react';
 
 import { Album } from '../misc/types';
 
 import styles from './AlbumItem.module.css';
+import DuplicateModal from './DuplicateModal';
 import TagBadge from './TagBadge';
 
 export interface AlbumItemProperties {
@@ -31,6 +33,15 @@ export default function AlbumItem({
   } else if (isUndefined(album.date)) {
     dateString = 'Unknown';
   }
+  const [duplicateModalVisible, setDuplicateModalVisible] = useState(false);
+  const hideDuplicateModalVisible = useCallback(
+    () => setDuplicateModalVisible(false),
+    [],
+  );
+  const showDuplicateModalVisible = useCallback(
+    () => setDuplicateModalVisible(true),
+    [],
+  );
   return (
     <List.Item
       className={styles.root}
@@ -50,7 +61,10 @@ export default function AlbumItem({
         description={
           <>
             <Typography.Paragraph>
-              Released at: {dateString}
+              <Typography.Text>Released at: {dateString}</Typography.Text>
+              <Button ghost onClick={showDuplicateModalVisible}>
+                Duplicate?
+              </Button>
             </Typography.Paragraph>
             <Typography.Paragraph ellipsis={ELLIPSIS_CONFIG}>
               {map(
@@ -74,8 +88,16 @@ export default function AlbumItem({
             <Typography.Text className={styles.title} copyable>
               {title}
             </Typography.Text>
+            {album.duplicateOf && <Tag color="warning">DUPLICATE</Tag>}
           </>
         }
+      />
+      <DuplicateModal
+        hide={hideDuplicateModalVisible}
+        show={showDuplicateModalVisible}
+        targetArtist={album.artist}
+        targetId={album.id}
+        visible={duplicateModalVisible}
       />
     </List.Item>
   );

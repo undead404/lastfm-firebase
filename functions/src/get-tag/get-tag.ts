@@ -14,7 +14,6 @@ export default async function getTag(
   }
   const tag = await mongodb.tags.findOne({ name: tagName });
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  delete (tag as any)._id;
   if (!tag) {
     return null;
   }

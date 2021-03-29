@@ -53,9 +53,14 @@ export default async function populateAlbumsDates(): Promise<void> {
           { _id: album._id },
           { $set: albumUpdate },
         );
+      } else {
+        throw new Error('Not Found');
       }
     } catch (error) {
-      if (startsWith(error.message, 'Got response status 404')) {
+      if (
+        startsWith(error.message, 'Got response status 404') ||
+        startsWith(error.message, 'Not Found')
+      ) {
         await mongodb.albums.updateOne(
           {
             _id: album._id,
@@ -63,6 +68,7 @@ export default async function populateAlbumsDates(): Promise<void> {
           { $set: { date: null } },
         );
       }
+      logger.error(error);
       logger.error(`Failed to get date for: ${album.artist} - ${album.name}`);
     }
     await sleep(API_DELAY_MS);

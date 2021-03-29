@@ -1,5 +1,6 @@
 import { logger } from 'firebase-functions';
 import size from 'lodash/size';
+import { WithId } from 'mongodb';
 
 import mongodb from '../common/mongo-database';
 import { AlbumRecord, Weighted } from '../common/types';
@@ -21,10 +22,13 @@ export default async function generateList(): Promise<void> {
     logger.warn('Failed to find sufficient tag');
     return;
   }
-  let albums: Weighted<AlbumRecord>[] | null = await mongodb.albums
-    .aggregate<Weighted<AlbumRecord>>([
+  let albums: Weighted<WithId<AlbumRecord>>[] | undefined = await mongodb.albums
+    .aggregate<Weighted<WithId<AlbumRecord>>>([
       {
         $match: {
+          date: {
+            $ne: null,
+          },
           [`tags.${tagRecord.name}`]: {
             $gt: 0,
           },
@@ -32,7 +36,6 @@ export default async function generateList(): Promise<void> {
       },
       {
         $project: {
-          _id: false,
           artist: true,
           cover: true,
           date: true,
@@ -79,7 +82,7 @@ export default async function generateList(): Promise<void> {
     .toArray();
   if (size(albums) < LIST_LENGTH) {
     logger.warn(`${size(albums)}, but required at least ${LIST_LENGTH}`);
-    albums = null;
+    albums = undefined;
   }
   await saveList(tagRecord, albums);
 }

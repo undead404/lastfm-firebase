@@ -10,6 +10,9 @@ import populateAlbumsDatesFunction from './populate-albums-dates';
 import populateAlbumsStatsFunction from './populate-albums-stats';
 import populateAlbumsTagsFunction from './populate-albums-tags';
 import scrapeAlbumsFunction from './scrape-albums';
+import searchAlbumsFunction from './search-albums';
+import setAlbumDuplicateFunction from './set-album-duplicate';
+import storeTagsFunction from './store-tags';
 
 firebase.initializeApp();
 
@@ -21,17 +24,15 @@ firebase.initializeApp();
 //   response.send("Hello from Firebase!");
 // });
 
-export const generateList = pubsub
-  .schedule('every 5 minutes')
-  .onRun(async () => {
-    try {
-      await generateListFunction();
-      return null;
-    } catch (error) {
-      logger.error(error);
-      throw error;
-    }
-  });
+export const generateList = pubsub.schedule('0 * * * *').onRun(async () => {
+  try {
+    await generateListFunction();
+    return null;
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
 
 export const getStats = https.onCall(() => getStatsFunction());
 
@@ -118,6 +119,34 @@ export const scrapeAlbums = runWith({
     try {
       await scrapeAlbumsFunction();
       return null;
+    } catch (error) {
+      logger.error(error);
+      throw error;
+    }
+  });
+
+export const searchAlbums = https.onCall(async (data) => {
+  try {
+    return await searchAlbumsFunction(data);
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
+export const setAlbumDuplicate = https.onCall(async (data) => {
+  try {
+    return await setAlbumDuplicateFunction(data);
+  } catch (error) {
+    logger.error(error);
+    throw error;
+  }
+});
+
+export const storeTags = pubsub
+  .topic('store-tags')
+  .onPublish(async (message) => {
+    try {
+      await storeTagsFunction(message.json);
     } catch (error) {
       logger.error(error);
       throw error;

@@ -26,30 +26,48 @@ export default async function getTags({
   }
   const [tags, total] = await Promise.all([
     mongodb.tags
-      .find({
-        topAlbums: { $ne: null },
-      })
-      .project<SerializableTag>({
-        _id: false,
-        lastProcessedAt: {
-          $dateToString: {
-            date: '$lastProcessedAt',
+      .aggregate<SerializableTag>(
+        [
+          { $match: { topAlbums: { $exists: true } } },
+          {
+            $project: {
+              _id: false,
+              lastProcessedAt: true,
+              name: true,
+              listCreatedAt: true,
+              power: true,
+              topAlbums: true,
+            },
           },
-        },
-        name: true,
-        listCreatedAt: {
-          $dateToString: {
-            date: '$listCreatedAt',
+          {
+            $sort: {
+              power: -1,
+            },
           },
+          { $skip: offset },
+          { $limit: limit },
+          {
+            $project: {
+              lastProcessedAt: {
+                $dateToString: {
+                  date: '$lastProcessedAt',
+                },
+              },
+              name: true,
+              listCreatedAt: {
+                $dateToString: {
+                  date: '$listCreatedAt',
+                },
+              },
+              power: true,
+              topAlbums: true,
+            },
+          },
+        ],
+        {
+          allowDiskUse: true,
         },
-        power: true,
-        topAlbums: true,
-      })
-      .sort({
-        power: -1,
-      })
-      .skip(offset)
-      .limit(limit)
+      )
       .toArray(),
     countTags(),
   ]);

@@ -9,9 +9,5 @@ export interface GetTagsOptions {
 
 export default async function countTags(): Promise<number> {
   logger.debug('countTags()');
-  return mongodb.tags
-    .find({
-      topAlbums: { $ne: null },
-    })
-    .count();
+  return mongodb.tags.countDocuments({ topAlbums: { $exists: true } });
 }
